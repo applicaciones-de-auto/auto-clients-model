@@ -323,87 +323,87 @@ public class Model_Client_Master implements GEntity{
         return psMessage;
     }
     
-    public JSONObject getColValues(){
-        JSONObject jObj = new JSONObject();
-        try {
-            int lnRow = poEntity.getMetaData().getColumnCount();
-            String lsValue = "";
-            for (int lnCtr = 1; lnCtr <= lnRow; lnCtr++){
-                System.out.println("Column index: " + (lnCtr) + " --> Label: " + poEntity.getMetaData().getColumnLabel(lnCtr));
-                if(getValue(poEntity.getMetaData().getColumnLabel(lnCtr)) == null){
-                    lsValue ="";
-                } else {
-                   lsValue = String.valueOf(getValue(poEntity.getMetaData().getColumnLabel(lnCtr)));
-                }
-                jObj.put(lnCtr,lsValue );
-            }
-            jObj.put("pnEditMode",String.valueOf(pnEditMode));
-        } catch (SQLException ex) {
-            Logger.getLogger(Model_Client_Master.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        return jObj;
-    }
-    
-    public JSONObject updateColValues(JSONObject masterObject ){
-        JSONObject jObj = new JSONObject();
-        String tempValue = "";
-        
-        try {
-            for (Object key : masterObject.keySet()) {
-                Object value = masterObject.get(key);
-                if(value == null){
-                    tempValue = "";
-                } else {
-                    tempValue = String.valueOf(value);
-                }
-                
-                if(!key.toString().equals("pnEditMode")){
-                    switch(poEntity.getMetaData().getColumnType(Integer.valueOf(key.toString()))){
-                        case Types.CHAR:
-                        case Types.VARCHAR:
-                            poEntity.updateObject(Integer.valueOf(key.toString()), tempValue);
-                            break;
-                        case Types.DATE:
-                        case Types.TIMESTAMP:
-                            if(String.valueOf(tempValue).isEmpty()){
-                                tempValue = psDefaultDate;
-                            } else {
-                                tempValue = String.valueOf(value);
-                            }
-                            poEntity.updateObject(Integer.valueOf(key.toString()), SQLUtil.toDate(tempValue, SQLUtil.FORMAT_SHORT_DATE) );
-                            break;
-                        case Types.INTEGER:
-                            if(String.valueOf(tempValue).isEmpty()){
-                                tempValue = "0";
-                            } else {
-                                tempValue = String.valueOf(value);
-                            }
-                            poEntity.updateObject(Integer.valueOf(key.toString()), Integer.valueOf(tempValue));
-                            break;
-                        case Types.DECIMAL:
-                        case Types.DOUBLE:
-                            if(String.valueOf(tempValue).isEmpty()){
-                                tempValue = "0.00";
-                            } else {
-                                tempValue = String.valueOf(value);
-                            }
-                            poEntity.updateObject(Integer.valueOf(key.toString()), Double.valueOf(tempValue));
-                            break;
-                        default:
-                            poEntity.updateObject(Integer.valueOf(key.toString()), tempValue);
-                            break;
-                    }
-                }
-                
-                System.out.println(key.toString() + " : " + tempValue);
-                tempValue = "";
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Model_Client_Master.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return jObj;
-    }
+//    public JSONObject getColValues(){
+//        JSONObject jObj = new JSONObject();
+//        try {
+//            int lnRow = poEntity.getMetaData().getColumnCount();
+//            String lsValue = "";
+//            for (int lnCtr = 1; lnCtr <= lnRow; lnCtr++){
+//                System.out.println("Column index: " + (lnCtr) + " --> Label: " + poEntity.getMetaData().getColumnLabel(lnCtr));
+//                if(getValue(poEntity.getMetaData().getColumnLabel(lnCtr)) == null){
+//                    lsValue ="";
+//                } else {
+//                   lsValue = String.valueOf(getValue(poEntity.getMetaData().getColumnLabel(lnCtr)));
+//                }
+//                jObj.put(lnCtr,lsValue );
+//            }
+//            jObj.put("pnEditMode",String.valueOf(pnEditMode));
+//        } catch (SQLException ex) {
+//            Logger.getLogger(Model_Client_Master.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        
+//        return jObj;
+//    }
+//    
+//    public JSONObject updateColValues(JSONObject masterObject ){
+//        JSONObject jObj = new JSONObject();
+//        String tempValue = "";
+//        
+//        try {
+//            for (Object key : masterObject.keySet()) {
+//                Object value = masterObject.get(key);
+//                if(value == null){
+//                    tempValue = "";
+//                } else {
+//                    tempValue = String.valueOf(value);
+//                }
+//                
+//                if(!key.toString().equals("pnEditMode")){
+//                    switch(poEntity.getMetaData().getColumnType(Integer.valueOf(key.toString()))){
+//                        case Types.CHAR:
+//                        case Types.VARCHAR:
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), tempValue);
+//                            break;
+//                        case Types.DATE:
+//                        case Types.TIMESTAMP:
+//                            if(String.valueOf(tempValue).isEmpty()){
+//                                tempValue = psDefaultDate;
+//                            } else {
+//                                tempValue = String.valueOf(value);
+//                            }
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), SQLUtil.toDate(tempValue, SQLUtil.FORMAT_SHORT_DATE) );
+//                            break;
+//                        case Types.INTEGER:
+//                            if(String.valueOf(tempValue).isEmpty()){
+//                                tempValue = "0";
+//                            } else {
+//                                tempValue = String.valueOf(value);
+//                            }
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), Integer.valueOf(tempValue));
+//                            break;
+//                        case Types.DECIMAL:
+//                        case Types.DOUBLE:
+//                            if(String.valueOf(tempValue).isEmpty()){
+//                                tempValue = "0.00";
+//                            } else {
+//                                tempValue = String.valueOf(value);
+//                            }
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), Double.valueOf(tempValue));
+//                            break;
+//                        default:
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), tempValue);
+//                            break;
+//                    }
+//                }
+//                
+//                System.out.println(key.toString() + " : " + tempValue);
+//                tempValue = "";
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(Model_Client_Master.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return jObj;
+//    }
     
     public String getSQL(){
         return    "  SELECT      "                                                                                      
@@ -432,9 +432,7 @@ public class Model_Client_Master implements GEntity{
                 + ", a.sModified "  //23                                                                                
                 + ", a.dModified "  //24                                                                                
                 + ", IFNULL(b.sCntryNme, '') sCntryNme   " //25                                                         
-                + ", TRIM(CONCAT(c.sTownName, ', ', d.sProvName)) sTownName   "   //26                                  
-//                + ", TRIM(CONCAT(a.sLastName, ', ', a.sFrstName, ' ', a.sSuffixNm, ' ', a.sMiddName)) sCustName  " //27 
-//                + ", TRIM(CONCAT(e.sLastName, ', ', e.sFrstName, ' ', e.sMiddName)) sSpouseNm   " //28     
+                + ", TRIM(CONCAT(c.sTownName, ', ', d.sProvName)) sTownName   "   //26                
                 + ", e.sCompnyNm    sSpouseNm " //27
                 + ",  IFNULL(CONCAT( IFNULL(CONCAT(g.sHouseNox,' ') , ''),    "                                         
                 + "   IFNULL(CONCAT(g.sAddressx,' ') , ''),                   "                                         
@@ -1010,5 +1008,9 @@ public class Model_Client_Master implements GEntity{
      */
     public String getAddressx(){
         return (String) getValue("sAddressx");
+    }
+
+    public JSONObject updateColValues(JSONObject jsonObject) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
