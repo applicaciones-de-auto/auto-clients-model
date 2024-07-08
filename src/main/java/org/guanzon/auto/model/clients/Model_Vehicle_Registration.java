@@ -387,23 +387,23 @@ public class Model_Vehicle_Registration implements GEntity {
     }
     
     public String getSQL(){
-        return  "SELECT "   +                                                 
-                "  IFNULL(a.sSerialID,'') AS sSerialID, " +                  
-                "  IFNULL(a.sCSRValNo,'') AS sCSRValNo, " +                  
-                "  IFNULL(a.sPNPClrNo,'') AS sPNPClrNo, " +                  
-                "  IFNULL(a.sCRNoxxxx,'') AS sCRNoxxxx, " +                  
-                "  IFNULL(a.sCRENoxxx,'') AS sCRENoxxx, " +                  
-                "  IFNULL(a.sRegORNox,'') AS sRegORNox, " +                  
-                "  IFNULL(a.sFileNoxx,'') AS sFileNoxx, " +                  
-                "  IFNULL(a.sPlateNox,'') AS sPlateNox, " +                  
-                "  IFNULL(a.dRegister,'') AS dRegister, " +                  
-                "  IFNULL(a.sPlaceReg,'') AS sPlaceReg, " +                  
-                "  IFNULL(a.sEntryByx,'') AS sEntryByx, " +                  
-                "  IFNULL(a.dEntryDte,'') AS dEntryDte, " +                  
-                "  IFNULL(a.sModified,'') AS sModified, " +                  
-                "  IFNULL(a.dModified,'') AS dModified  " +                  
-                "FROM vehicle_serial_registration a	" +                  
-                "LEFT JOIN vehicle_serial b ON b.sSerialID = a.sSerialID ";  
+        return    "  SELECT     "                        
+                + "  a.sSerialID  " //1   
+                + ", a.sCSRValNo  " //2   
+                + ", a.sPNPClrNo  " //3   
+                + ", a.sCRNoxxxx  " //4   
+                + ", a.sCRENoxxx  " //5   
+                + ", a.sRegORNox  " //6   
+                + ", a.sFileNoxx  " //7   
+                + ", a.sPlateNox  " //8   
+                + ", a.dRegister  " //9   
+                + ", a.sPlaceReg  " //10  
+                + ", a.sEntryByx  " //11  
+                + ", a.dEntryDte  " //12  
+                + ", a.sModified  " //13  
+                + ", a.dModified  " //14                
+                + "FROM vehicle_serial_registration a "                    
+                + "LEFT JOIN vehicle_serial b ON b.sSerialID = a.sSerialID ";  
     }                                                                            
 
     /**

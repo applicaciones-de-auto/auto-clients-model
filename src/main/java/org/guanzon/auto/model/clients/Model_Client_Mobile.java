@@ -295,26 +295,26 @@ public class Model_Client_Mobile  implements GEntity{
     }
     
     public String getSQL(){
-        return    "  SELECT "                           
-                + "  IFNULL(sMobileID,'') sMobileID" //1 
-                + ", IFNULL(sClientID,'') sClientID" //2 
-                + ", IFNULL(sMobileNo,'') sMobileNo" //3 
-                + ", IFNULL(cMobileTp,'') cMobileTp" //4 
-                + ", IFNULL(cOwnerxxx,'') cOwnerxxx" //5 
-                + ", IFNULL(cIncdMktg,'') cIncdMktg" //6 
-                + ", IFNULL(cVerified,'') cVerified" //7 
-                + ", dLastVeri " 		     //8 
-                + ", IFNULL(cInvalidx,'') cInvalidx" //9 
-                + ", dInvalidx " 	             //10
-                + ", IFNULL(cPrimaryx,'') cPrimaryx" //11
-                + ", IFNULL(cSubscrbr,'') cSubscrbr" //12
-                + ", IFNULL(sRemarksx,'') sRemarksx" //13
-                + ", IFNULL(cRecdStat,'') cRecdStat" //14
-                + ", IFNULL(sEntryByx,'') sEntryByx" //15
-                + ", dEntryDte " 		     //16
-                + ", IFNULL(sModified,'') sModified" //17
-                + ", dModified "		     //18
-                + " FROM " + getTable();                 
+        return    "  SELECT     "         
+                + "  sMobileID  "//1      
+                + ", sClientID  "//2      
+                + ", sMobileNo  "//3      
+                + ", cMobileTp  "//4      
+                + ", cOwnerxxx  "//5      
+                + ", cIncdMktg  "//6      
+                + ", cVerified  "//7      
+                + ", dLastVeri  "//8      
+                + ", cInvalidx  "//9      
+                + ", dInvalidx  "//10     
+                + ", cPrimaryx  "//11     
+                + ", cSubscrbr  "//12     
+                + ", sRemarksx  "//13     
+                + ", cRecdStat  "//14     
+                + ", sEntryByx  "//15     
+                + ", dEntryDte  "//16     
+                + ", sModified  "//17     
+                + ", dModified  "//18     
+                + "FROM client_mobile  " ;                 
 
     }    
     
@@ -366,7 +366,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getMobileNo(){
-        return (String) getValue("sMobileNo");
+        String lsValue = "";
+        if(getValue("sMobileNo") != null){
+            lsValue = String.valueOf(getValue("sMobileNo"));
+        }
+        return lsValue;
     }
     
     /**
@@ -383,7 +387,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getMobileTp(){
-        return (String) getValue("cMobileTp");
+        String lsValue = "";
+        if(getValue("cMobileTp") != null){
+            lsValue = String.valueOf(getValue("cMobileTp"));
+        }
+        return lsValue;
     }
     
     /**
@@ -400,7 +408,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getOwner(){
-        return (String) getValue("cOwnerxxx");
+        String lsValue = "";
+        if(getValue("cOwnerxxx") != null){
+            lsValue = String.valueOf(getValue("cOwnerxxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -417,7 +429,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getIncdMktg(){
-        return (String) getValue("cIncdMktg");
+        String lsValue = "";
+        if(getValue("cIncdMktg") != null){
+            lsValue = String.valueOf(getValue("cIncdMktg"));
+        }
+        return lsValue;
     }
     
     /**
@@ -434,7 +450,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getVerified(){
-        return (String) getValue("cVerified");
+        String lsValue = "";
+        if(getValue("cVerified") != null){
+            lsValue = String.valueOf(getValue("cVerified"));
+        }
+        return lsValue;
     }
     
     /**
@@ -450,8 +470,8 @@ public class Model_Client_Mobile  implements GEntity{
     /** 
      * @return The Value of this record. 
      */
-    public String getdLastVeri(){
-        return (String) getValue("dLastVeri");
+    public Date getdLastVeri(){
+        return (Date) getValue("dLastVeri");
     }
     
     /**
@@ -468,7 +488,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getInvalid(){
-        return (String) getValue("cInvalidx");
+        String lsValue = "";
+        if(getValue("cInvalidx") != null){
+            lsValue = String.valueOf(getValue("cInvalidx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -519,7 +543,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getSubscrbr(){
-        return (String) getValue("cSubscrbr");
+        String lsValue = "";
+        if(getValue("cSubscrbr") != null){
+            lsValue = String.valueOf(getValue("cSubscrbr"));
+        }
+        return lsValue;
     }
     
     /**
@@ -553,7 +581,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getRecdStat(){
-        return (String) getValue("cRecdStat");
+        String lsValue = "";
+        if(getValue("cRecdStat") != null){
+            lsValue = String.valueOf(getValue("cRecdStat"));
+        }
+        return lsValue;
     }
     
     /**
@@ -570,7 +602,11 @@ public class Model_Client_Mobile  implements GEntity{
      * @return The Value of this record. 
      */
     public String getEntryBy(){
-        return (String) getValue("sEntryByx");
+        String lsValue = "";
+        if(getValue("sEntryByx") != null){
+            lsValue = String.valueOf(getValue("sEntryByx"));
+        }
+        return lsValue;
     }
     
     /**

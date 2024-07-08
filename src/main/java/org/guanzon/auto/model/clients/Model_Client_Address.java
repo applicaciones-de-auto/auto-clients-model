@@ -73,6 +73,8 @@ public class Model_Client_Address implements GEntity{
             poEntity.moveToCurrentRow();
 
             poEntity.absolute(1);
+            
+            list();
         } catch (SQLException e) {
             e.printStackTrace();
             System.exit(1);
@@ -322,37 +324,37 @@ public class Model_Client_Address implements GEntity{
     }
     
     public String getSQL(){
-        return    " SELECT   "                                                                                   
-                + "   IFNULL(a.sAddrssID, '')  sAddrssID   " //1                                                
-                + " , IFNULL(a.sClientID, '')  sClientID   " //2                                                
-                + " , IFNULL(b.sHouseNox, '')  sHouseNox   " //3                                                
-                + " , IFNULL(b.sAddressx, '')  sAddressx   " //4                                                
-                + " , IFNULL(b.sTownIDxx, '')  sTownIDxx   " //5                                                
-                + " , IFNULL(b.sBrgyIDxx, '')  sBrgyIDxx   " //6                                                
-                + " , IFNULL(b.sZippCode, '')  sZippCode   " //7                                                
-                + " , b.nLatitude     "                      //8                                                
-                + " , b.nLongitud     "                      //9                                                
-                + " , IFNULL(b.sRemarksx, '')  sRemarksx   " //10                                               
-                + " , IFNULL(a.cOfficexx, '')  cOfficexx   " //11                                               
-                + " , IFNULL(a.cProvince, '')  cProvince   " //12                                               
-                + " , IFNULL(a.cPrimaryx, '')  cPrimaryx   " //13                                               
-                + " , IFNULL(a.cBillingx, '')  cBillingx   " //14                                               
-                + " , IFNULL(a.cShipping, '')  cShipping   " //15                                               
-                + " , IFNULL(a.cCurrentx, '')  cCurrentx   " //16                                               
-                + " , IFNULL(a.cRecdStat, '')  cRecdStat   " //17                                               
-                + " , IFNULL(a.sEntryByx, '')  sEntryByx   " //18                                               
-                + " , a.dEntryDte     "                      //19                                               
-                + " , IFNULL(a.sModified, '')  sModified   " //20                                               
-                + " , a.dModified     "                      //21                                               
-                + " , IFNULL(e.sProvName, '')  sProvName   " //22                                               
-                + " , IFNULL(d.sBrgyName, '')  sBrgyName   " //23                                               
-                + " , IFNULL(c.sTownName, '')  sTownName   " //24                                               
-                + " , IFNULL(e.sProvIDxx, '')  sProvIDxx   " //25                                               
-                + "  FROM client_address a                 "                                                    
-                + "  INNER JOIN addresses b ON b.sAddrssID = a.sAddrssID "                                     
-                + "  LEFT JOIN TownCity c ON c.sTownIDxx = b.sTownIDxx   "                                     
-                + "  LEFT JOIN Barangay d ON d.sBrgyIDxx = b.sBrgyIDxx AND d.sTownIDxx = b.sTownIDxx   "       
-                + "  LEFT JOIN Province e ON e.sProvIDxx = c.sProvIDxx   " ;                                    
+        return    "  SELECT      "                                                                   
+                + "  a.sAddrssID " //1                                                               
+                + ", a.sClientID " //2                                                               
+                + ", a.cOfficexx " //3                                                               
+                + ", a.cProvince " //4                                                               
+                + ", a.cPrimaryx " //5                                                               
+                + ", a.cBillingx " //6                                                               
+                + ", a.cShipping " //7                                                               
+                + ", a.cCurrentx " //8                                                               
+                + ", a.cRecdStat " //9                                                               
+                + ", a.sEntryByx " //10                                                              
+                + ", a.dEntryDte " //11                                                              
+                + ", a.sModified " //12                                                              
+                + ", a.dModified " //13                                                              
+                + ", b.sHouseNox " //14                                                              
+                + ", b.sAddressx " //15                                                              
+                + ", b.sTownIDxx " //16                                                              
+                + ", b.sZippCode " //17                                                              
+                + ", b.sBrgyIDxx " //18                                                              
+                + ", b.nLatitude " //19                                                              
+                + ", b.nLongitud " //20                                                              
+                + ", b.sRemarksx " //21                                                              
+                + ", d.sBrgyName " //22                                                              
+                + ", c.sTownName " //23                                                              
+                + ", e.sProvName " //24                                                              
+                + ", e.sProvIDxx " //25                                                              
+                + "FROM client_address a   "                                                         
+                + "INNER JOIN addresses b ON b.sAddrssID = a.sAddrssID  "                            
+                + "LEFT JOIN TownCity c ON c.sTownIDxx = b.sTownIDxx    "                            
+                + "LEFT JOIN Barangay d ON d.sBrgyIDxx = b.sBrgyIDxx AND d.sTownIDxx = b.sTownIDxx " 
+                + "LEFT JOIN Province e ON e.sProvIDxx = c.sProvIDxx    "    ;                                    
     }
     
     /**
@@ -408,7 +410,11 @@ public class Model_Client_Address implements GEntity{
      * @return The Value of this record. 
      */
     public String getHouseNo(){
-        return (String) getValue("sHouseNox");
+        String lsValue = "";
+        if(getValue("sHouseNox") != null){
+            lsValue = String.valueOf(getValue("sHouseNox"));
+        }
+        return lsValue;
     }
     
     /**
@@ -442,7 +448,11 @@ public class Model_Client_Address implements GEntity{
      * @return The Value of this record. 
      */
     public String getTownID(){
-        return (String) getValue("sTownIDxx");
+        String lsValue = "";
+        if(getValue("sTownIDxx") != null){
+            lsValue = String.valueOf(getValue("sTownIDxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -459,7 +469,11 @@ public class Model_Client_Address implements GEntity{
      * @return The Value of this record. 
      */
     public String getBrgyID(){
-        return (String) getValue("sBrgyIDxx");
+        String lsValue = "";
+        if(getValue("sBrgyIDxx") != null){
+            lsValue = String.valueOf(getValue("sBrgyIDxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -476,7 +490,11 @@ public class Model_Client_Address implements GEntity{
      * @return The Value of this record. 
      */
     public String getZippCode(){
-        return (String) getValue("sZippCode");
+        String lsValue = "";
+        if(getValue("sZippCode") != null){
+            lsValue = String.valueOf(getValue("sZippCode"));
+        }
+        return lsValue;
     }
     
     /**
@@ -485,15 +503,15 @@ public class Model_Client_Address implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public JSONObject setLatitude(String fsValue){
-        return setValue("nLatitude", fsValue);
+    public JSONObject setLatitude(Double fdValue){
+        return setValue("nLatitude", fdValue);
     }
     
     /** 
      * @return The Value of this record. 
      */
-    public String getLatitude(){
-        return (String) getValue("nLatitude");
+    public Double getLatitude(){
+        return (Double) getValue("nLatitude");
     }
     
     /**
@@ -502,15 +520,15 @@ public class Model_Client_Address implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public JSONObject setLongitud(String fsValue){
-        return setValue("nLongitud", fsValue);
+    public JSONObject setLongitud(String fdValue){
+        return setValue("nLongitud", fdValue);
     }
     
     /** 
      * @return The Value of this record. 
      */
-    public String getLongitud(){
-        return (String) getValue("nLongitud");
+    public Double getLongitud(){
+        return (Double) getValue("nLongitud");
     }
     
     /**
@@ -663,7 +681,11 @@ public class Model_Client_Address implements GEntity{
      * @return The Value of this record. 
      */
     public String getEntryBy(){
-        return (String) getValue("sEntryByx");
+        String lsValue = "";
+        if(getValue("sEntryByx") != null){
+            lsValue = String.valueOf(getValue("sEntryByx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -782,7 +804,11 @@ public class Model_Client_Address implements GEntity{
      * @return The Value of this record. 
      */
     public String getProvID(){
-        return (String) getValue("sProvIDxx");
+        String lsValue = "";
+        if(getValue("sProvIDxx") != null){
+            lsValue = String.valueOf(getValue("sProvIDxx"));
+        }
+        return lsValue;
     }
     
 }
