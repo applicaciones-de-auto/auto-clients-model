@@ -387,95 +387,87 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     }
     
     public String getSQL(){
-        return  "SELECT" + //
-                "   IFNULL(a.sSerialID,'') sSerialID " + //1
-                " , IFNULL(a.sBranchCD,'') sBranchCD " + //2
-                " , IFNULL(a.sFrameNox,'') sFrameNox " + //3
-                " , IFNULL(a.sEngineNo,'') sEngineNo " + //4
-                " , IFNULL(a.sVhclIDxx,'') sVhclIDxx " + //5
-                " , IFNULL(a.sClientID,'') sClientID " + //6
-                " , IFNULL(a.sCoCltIDx,'') sCoCltIDx " + //7
-                " , IFNULL(a.sCSNoxxxx,'') sCSNoxxxx " + //8
-                " , IFNULL(a.sDealerNm,'') sDealerNm " + //9
-                " , IFNULL(a.sCompnyID,'') sCompnyID " + //10
-                " , IFNULL(a.sKeyNoxxx,'') sKeyNoxxx " + //11
-                " , IFNULL(a.cIsDemoxx,'') cIsDemoxx " + //12
-                " , IFNULL(a.cLocation,'') cLocation " + //13
-                " , IFNULL(a.cSoldStat,'') cSoldStat " + //14
-                " , IFNULL(a.cVhclNewx,'') cVhclNewx " + //15
-                " , a.sEntryByx " + //16
-                " , a.dEntryDte " + //17
-                " , a.sModified " + //18
-                " , a.dModified " + //19
-                " , IFNULL(b.sPlateNox,'') sPlateNox " + //20
-                " , IFNULL(b.dRegister,CAST('1900-01-01' AS DATE)) dRegister " + //21
-                " , IFNULL(b.sPlaceReg,'') sPlaceReg " + //22
-                " , IFNULL(c.sMakeIDxx,'') sMakeIDxx " + //23
-                " , IFNULL(d.sMakeDesc,'') sMakeDesc " + //24 
-                " , IFNULL(c.sModelIDx,'') sModelIDx " + //25
-                " , IFNULL(e.sModelDsc,'') sModelDsc " + //26   
-                " , IFNULL(c.sTypeIDxx,'') sTypeIDxx " + //27 
-                " , IFNULL(f.sTypeDesc,'') sTypeDesc " + //28   
-                " , IFNULL(c.sColorIDx,'') sColorIDx " + //29 
-                " , IFNULL(g.sColorDsc,'') sColorDsc " + //30
-                " , IFNULL(c.sTransMsn,'') sTransMsn " + //31
-                " , IFNULL(c.nYearModl,'') nYearModl " + //32
-                " , IFNULL(c.sDescript,'') sDescript " + //33
-                " , IFNULL(a.sRemarksx,'') sRemarksx " + //34
-                " , IFNULL(h.sCompnyNm,'') sOwnerNam " + //35
-                " , IFNULL(i.sCompnyNm,'') sCoOwnerN " + //36
-                " , IFNULL(CONCAT(IFNULL(CONCAT(jj.sHouseNox,' ') , ''), IFNULL(CONCAT(jj.sAddressx,' ') , ''), " +
-                " 	IFNULL(CONCAT(l.sBrgyName,' '), ''), " +
-                " 	IFNULL(CONCAT(k.sTownName, ', '),''), " +
-                " 	IFNULL(CONCAT(m.sProvName),'') )	, '') AS sOwnerAdd " + //37 
-                " , IFNULL(CONCAT(IFNULL(CONCAT(nn.sHouseNox,' ') , ''), IFNULL(CONCAT(nn.sAddressx,' ') , ''), " +
-                " 	IFNULL(CONCAT(p.sBrgyName,' '), ''), " +
-                " 	IFNULL(CONCAT(o.sTownName, ', '),''), " +
-                " 	IFNULL(CONCAT(q.sProvName),'') )	, '') AS sCoOwnerA " + //38 
-                " ,CASE " +
-                    "    WHEN a.cSoldStat = '0' THEN 'NON SALES CUSTOMER' " +
-                    "    WHEN a.cSoldStat = '1' THEN 'AVAILABLE FOR SALE' " +
-                    "    WHEN a.cSoldStat = '2' THEN 'VSP' " +
-                    "    WHEN a.cSoldStat = '3' THEN 'SOLD' " +
-                    "    ELSE '' " +
-                    " END AS sVhclStat  " + //39
-                " , IFNULL(r.sReferNox,'') sUdrNoxxx " + //40
-                " , IFNULL(r.dTransact,'') sUdrDatex " + //41
-                " , IFNULL(s.sCompnyNm,'') sSoldToxx " + //42
-                "   FROM vehicle_serial a " + 
-                "   LEFT JOIN vehicle_serial_registration b ON a.sSerialID = b.sSerialID  " +
-                "   LEFT JOIN vehicle_master c ON c.sVhclIDxx = a.sVhclIDxx  " +
-                "   LEFT JOIN vehicle_make d ON d.sMakeIDxx = c.sMakeIDxx  " +
-                "   LEFT JOIN vehicle_model e ON e.sModelIDx = c.sModelIDx  " +
-                "   LEFT JOIN vehicle_type f ON f.sTypeIDxx = c.sTypeIDxx  " +
-                "   LEFT JOIN vehicle_color g ON g.sColorIDx = c.sColorIDx  " +
-                "   LEFT JOIN client_master h ON h.sClientID = a.sClientID  " +
-                "   LEFT JOIN client_master i ON i.sClientID = a.sCoCltIDx  " +
-                // Owner Address
-                "   LEFT JOIN client_address j ON j.sClientID = a.sClientID AND j.cPrimaryx = '1' " + //AND h.cRecdStat = '1' " +
-                "   LEFT JOIN addresses jj ON jj.sAddrssID = j.sAddrssID " + 
-                "   LEFT JOIN TownCity k on k.sTownIDxx = jj.sTownIDxx " + //AND i.cRecdStat = '1'
-                "   LEFT JOIN barangay l ON l.sBrgyIDxx = jj.sBrgyIDxx and l.sTownIDxx = jj.sTownIDxx " + // AND j.cRecdStat = '1'  " +
-                "   LEFT JOIN Province m ON m.sProvIDxx = k.sProvIDxx " + // and k.cRecdStat = '1' " +
-                //Co Owner Address
-                "   LEFT JOIN client_address n ON n.sClientID = a.sCoCltIDx AND n.cPrimaryx = '1' " + //AND h.cRecdStat = '1' " +
-                "   LEFT JOIN addresses nn ON nn.sAddrssID = n.sAddrssID " + 
-                "   LEFT JOIN TownCity o on o.sTownIDxx = nn.sTownIDxx " + //AND i.cRecdStat = '1'
-                "   LEFT JOIN barangay p ON p.sBrgyIDxx = nn.sBrgyIDxx and p.sTownIDxx = nn.sTownIDxx " + // AND j.cRecdStat = '1'  " +
-                "   LEFT JOIN Province q ON q.sProvIDxx = o.sProvIDxx "  +// and k.cRecdStat = '1' " +
-                //UDR INFO
-                "   LEFT JOIN udr_master r ON r.sSerialID = a.sSerialID  AND r.sClientID = a.sClientID AND r.cTranStat = '1'"  +
-                "   LEFT JOIN client_master s ON s.sClientID = r.sClientID "  ;
-                // Owner Address
-//                "   LEFT JOIN addresses t ON t.sAddrssID = j.sAddrssID " + 
-//                "   LEFT JOIN TownCity k on k.sTownIDxx = t.sTownIDxx " + //AND i.cRecdStat = '1'
-//                "   LEFT JOIN barangay l ON l.sBrgyIDxx = t.sBrgyIDxx and l.sTownIDxx = t.sTownIDxx " + // AND j.cRecdStat = '1'  " +
-//                "   LEFT JOIN Province m ON m.sProvIDxx = k.sProvIDxx " + // and k.cRecdStat = '1' " +
-                //Co Owner Address
-//                "   LEFT JOIN addresses u ON u.sAddrssID = n.sAddrssID " +  
-//                "   LEFT JOIN TownCity o on o.sTownIDxx = u.sTownIDxx " + //AND i.cRecdStat = '1'
-//                "   LEFT JOIN barangay p ON p.sBrgyIDxx = u.sBrgyIDxx and p.sTownIDxx = u.sTownIDxx " + // AND j.cRecdStat = '1'  " +
-//                "   LEFT JOIN Province q ON q.sProvIDxx = o.sProvIDxx "  ;// and k.cRecdStat = '1' " +
+        return            "  SELECT      "                                                                                               
+                        + "  a.sSerialID " //1                                                                                           
+                        + ", a.sBranchCD " //2                                                                                           
+                        + ", a.sFrameNox " //3                                                                                           
+                        + ", a.sEngineNo " //4                                                                                           
+                        + ", a.sVhclIDxx " //5                                                                                           
+                        + ", a.sClientID " //6                                                                                           
+                        + ", a.sCoCltIDx " //7                                                                                           
+                        + ", a.sCSNoxxxx " //8                                                                                           
+                        + ", a.sDealerNm " //9                                                                                           
+                        + ", a.sCompnyID " //10                                                                                          
+                        + ", a.sKeyNoxxx " //11                                                                                          
+                        + ", a.cIsDemoxx " //12                                                                                          
+                        + ", a.cLocation " //13                                                                                          
+                        + ", a.cSoldStat " //14                                                                                          
+                        + ", a.cVhclNewx " //15                                                                                          
+                        + ", a.sRemarksx " //16                                                                                          
+                        + ", a.sEntryByx " //17                                                                                          
+                        + ", a.dEntryDte " //18                                                                                          
+                        + ", a.sModified " //19                                                                                          
+                        + ", a.dModified " //20                                                                                          
+                        + ", b.sPlateNox " //21                                                                                          
+                        + ", b.dRegister " //22                                                                                          
+                        + ", b.sPlaceReg " //23                                                                                          
+                        + ", c.sMakeIDxx " //24                                                                                          
+                        + ", d.sMakeDesc " //25                                                                                          
+                        + ", c.sModelIDx " //26                                                                                          
+                        + ", e.sModelDsc " //27                                                                                          
+                        + ", c.sTypeIDxx " //28                                                                                          
+                        + ", f.sTypeDesc " //29                                                                                          
+                        + ", c.sColorIDx " //30                                                                                          
+                        + ", g.sColorDsc " //31                                                                                          
+                        + ", c.sTransMsn " //32                                                                                          
+                        + ", c.nYearModl " //33                                                                                          
+                        + ", c.sDescript " //34                                                                                                                                                                                   
+                        + ", h.sCompnyNm " //35                                                                                          
+                        + ", i.sCompnyNm " //36                                                                                          
+                        + ", IFNULL(CONCAT(IFNULL(CONCAT(jj.sHouseNox,' ') , ''), IFNULL(CONCAT(jj.sAddressx,' ') , ''),      "              
+                        + "	IFNULL(CONCAT(l.sBrgyName,' '), ''),                                                          "              
+                        + "	IFNULL(CONCAT(k.sTownName, ', '),''),                                                         "              
+                        + "	IFNULL(CONCAT(m.sProvName),'') )	, '') AS sOwnerAdd                                    " //37         
+                        + "	                                                                                              "              
+                        + ", IFNULL(CONCAT(IFNULL(CONCAT(nn.sHouseNox,' ') , ''), IFNULL(CONCAT(nn.sAddressx,' ') , ''),      "              
+                        + "	IFNULL(CONCAT(p.sBrgyName,' '), ''),                                                          "              
+                        + "	IFNULL(CONCAT(o.sTownName, ', '),''),                                                         "              
+                        + "	IFNULL(CONCAT(q.sProvName),'') )	, '') AS sCoOwnerA                                    " //38         
+                        + "	                                                                                              "              
+                        + ",CASE                                                                                          "              
+                        + "  WHEN a.cSoldStat = '0' THEN 'NON SALES CUSTOMER'                                             "              
+                        + "  WHEN a.cSoldStat = '1' THEN 'AVAILABLE FOR SALE'                                             "              
+                        + "  WHEN a.cSoldStat = '2' THEN 'VSP'                                                            "              
+                        + "  WHEN a.cSoldStat = '3' THEN 'SOLD'                                                           "              
+                        + " ELSE ''                                                                                       "              
+                        + " END AS sVhclStat                                                                              " //39         
+                        + " , r.sReferNox                                                                                 " //40         
+                        + " , r.dTransact                                                                                 " //41         
+                        + " , s.sCompnyNm                                                                                 " //42         
+                        + "FROM vehicle_serial a                                                                          "              
+                        + "LEFT JOIN vehicle_serial_registration b ON a.sSerialID = b.sSerialID                           "              
+                        + "LEFT JOIN vehicle_master c ON c.sVhclIDxx = a.sVhclIDxx                                        "              
+                        + "LEFT JOIN vehicle_make   d ON d.sMakeIDxx = c.sMakeIDxx                                        "              
+                        + "LEFT JOIN vehicle_model  e ON e.sModelIDx = c.sModelIDx                                        "              
+                        + "LEFT JOIN vehicle_type   f ON f.sTypeIDxx = c.sTypeIDxx                                        "              
+                        + "LEFT JOIN vehicle_color  g ON g.sColorIDx = c.sColorIDx                                        "              
+                        + "LEFT JOIN client_master  h ON h.sClientID = a.sClientID                                        "              
+                        + "LEFT JOIN client_master  i ON i.sClientID = a.sCoCltIDx                                        "              
+                         /* Owner Address */                                                                                             
+                        + "LEFT JOIN client_address j ON j.sClientID = a.sClientID AND j.cPrimaryx = '1'                  "              
+                        + "LEFT JOIN addresses     jj ON jj.sAddrssID = j.sAddrssID                                       "              
+                        + "LEFT JOIN TownCity       k ON k.sTownIDxx = jj.sTownIDxx                                       "              
+                        + "LEFT JOIN barangay       l ON l.sBrgyIDxx = jj.sBrgyIDxx AND l.sTownIDxx = jj.sTownIDxx        "              
+                        + "LEFT JOIN Province       m ON m.sProvIDxx = k.sProvIDxx                                        "              
+                         /* Co Owner Address */                                                                                          
+                        + "LEFT JOIN client_address n ON n.sClientID = a.sCoCltIDx AND n.cPrimaryx = '1'                  "              
+                        + "LEFT JOIN addresses     nn ON nn.sAddrssID = n.sAddrssID                                       "              
+                        + "LEFT JOIN TownCity       o ON o.sTownIDxx = nn.sTownIDxx                                       "              
+                        + "LEFT JOIN barangay       p ON p.sBrgyIDxx = nn.sBrgyIDxx AND p.sTownIDxx = nn.sTownIDxx        "              
+                        + "LEFT JOIN Province       q ON q.sProvIDxx = o.sProvIDxx                                        "              
+                         /* UDR INFO */                                                                                                  
+                        + "LEFT JOIN udr_master     r ON r.sSerialID = a.sSerialID  AND r.sClientID = a.sClientID AND r.cTranStat = '1' "
+                        + "LEFT JOIN client_master  s ON s.sClientID = r.sClientID                                                      ";
                 
     }                                                                            
 

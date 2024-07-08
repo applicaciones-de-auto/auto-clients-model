@@ -298,18 +298,18 @@ public class Model_Client_Email implements GEntity{
     }
     
     public String getSQL(){
-        return    "  SELECT "                             
-                + "  IFNULL(sEmailIDx,'') sEmailIDx " //1  
-                + ", IFNULL(sClientID,'') sClientID " //2  
-                + ", IFNULL(sEmailAdd,'') sEmailAdd " //3  
-                + ", IFNULL(cOwnerxxx,'') cOwnerxxx " //4  
-                + ", IFNULL(cPrimaryx,'') cPrimaryx " //5  
-                + ", IFNULL(cRecdStat,'') cRecdStat " //6  
-                + ", IFNULL(sEntryByx,'') sEntryByx " //7  
-                + ", dEntryDte " 											//8  
-                + ", IFNULL(sModified,'') sModified " //9  
-                + ", dModified " 											//10 
-                + " FROM " + getTable();                   
+        return    "  SELECT    "              
+                + "  sEmailIDx " //1          
+                + ", sClientID " //2          
+                + ", sEmailAdd " //3          
+                + ", cOwnerxxx " //4          
+                + ", cPrimaryx " //5          
+                + ", cRecdStat " //6          
+                + ", sEntryByx " //7          
+                + ", dEntryDte " //8          
+                + ", sModified " //9          
+                + ", dModified " //10         
+                + "FROM client_email_address ";                   
     }
     
     /**
@@ -377,7 +377,11 @@ public class Model_Client_Email implements GEntity{
      * @return The Value of this record. 
      */
     public String getOwner(){
-        return (String) getValue("cOwnerxxx");
+        String lsValue = "";
+        if(getValue("cOwnerxxx") != null){
+            lsValue = String.valueOf(getValue("cOwnerxxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -394,7 +398,11 @@ public class Model_Client_Email implements GEntity{
      * @return The Value of this record. 
      */
     public String getPrimary(){
-        return (String) getValue("cPrimaryx");
+        String lsValue = "";
+        if(getValue("cPrimaryx") != null){
+            lsValue = String.valueOf(getValue("cPrimaryx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -411,7 +419,11 @@ public class Model_Client_Email implements GEntity{
      * @return The Value of this record. 
      */
     public String getRecdStat(){
-        return (String) getValue("cRecdStat");
+        String lsValue = "";
+        if(getValue("cRecdStat") != null){
+            lsValue = String.valueOf(getValue("cRecdStat"));
+        }
+        return lsValue;
     }
     
     /**
@@ -428,7 +440,11 @@ public class Model_Client_Email implements GEntity{
      * @return The Value of this record. 
      */
     public String getEntryBy(){
-        return (String) getValue("sEntryByx");
+        String lsValue = "";
+        if(getValue("sEntryByx") != null){
+            lsValue = String.valueOf(getValue("sEntryByx"));
+        }
+        return lsValue;
     }
     
     /**

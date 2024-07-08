@@ -285,17 +285,17 @@ public class Model_Client_Social_Media implements GEntity{
     }
     
     public String getSQL(){
-        return    "  SELECT "                               
-                + "  IFNULL(sSocialID,'') sSocialID "  //1  
-                + ", IFNULL(sClientID,'') sClientID "  //2  
-                + ", IFNULL(sAccountx,'') sAccountx "  //3  
-                + ", IFNULL(cSocialTp,'') cSocialTp "  //4  
-                + ", IFNULL(cRecdStat,'') cRecdStat "  //5  
-                + ", IFNULL(sEntryByx,'') sEntryByx "  //6  
-                + ", dEntryDte "  		       //7  
-                + ", IFNULL(sModified,'') sModified "  //8  
-                + ", dModified "                       //9  
-                + " FROM " + getTable();                    
+        return    "  SELECT    "                 
+                + "  sSocialID " //1             
+                + ", sClientID " //2             
+                + ", sAccountx " //3             
+                + ", cSocialTp " //4             
+                + ", cRecdStat " //5             
+                + ", sEntryByx " //6             
+                + ", dEntryDte " //7             
+                + ", sModified " //8             
+                + ", dModified " //9             
+                + "FROM client_social_media  " ;                    
     }
     
     /**
@@ -363,7 +363,11 @@ public class Model_Client_Social_Media implements GEntity{
      * @return The Value of this record. 
      */
     public String getSocialTp(){
-        return (String) getValue("cSocialTp");
+        String lsValue = "";
+        if(getValue("cSocialTp") != null){
+            lsValue = String.valueOf(getValue("cSocialTp"));
+        }
+        return lsValue;
     }
     
     /**
@@ -380,7 +384,11 @@ public class Model_Client_Social_Media implements GEntity{
      * @return The Value of this record. 
      */
     public String getRecdStat(){
-        return (String) getValue("cRecdStat");
+        String lsValue = "";
+        if(getValue("cRecdStat") != null){
+            lsValue = String.valueOf(getValue("cRecdStat"));
+        }
+        return lsValue;
     }
     
     /**
@@ -397,7 +405,11 @@ public class Model_Client_Social_Media implements GEntity{
      * @return The Value of this record. 
      */
     public String getEntryBy(){
-        return (String) getValue("sEntryByx");
+        String lsValue = "";
+        if(getValue("sEntryByx") != null){
+            lsValue = String.valueOf(getValue("sEntryByx"));
+        }
+        return lsValue;
     }
     
     /**

@@ -312,29 +312,29 @@ public class Model_Addresses implements GEntity{
     }
     
     public String getSQL() {
-        return    " SELECT  "                                                                           
-                + "   IFNULL(a.sAddrssID, '') sAddrssID"  //1                                         
-                + ",  IFNULL(a.sHouseNox, '') sHouseNox"  //2                                         
-                + ",  IFNULL(a.sAddressx, '') sAddressx"  //3                                         
-                + ",  IFNULL(a.sTownIDxx, '') sTownIDxx"  //4                                         
-                + ",  IFNULL(a.sZippCode, '') sZippCode"  //5                                         
-                + ",  IFNULL(a.sBrgyIDxx, '') sBrgyIDxx"  //6                                         
-                + ",  a.nLatitude "                       //7                                         
-                + ",  a.nLongitud "                       //8                                         
-                + ",  IFNULL(a.sRemarksx, '') sRemarksx"  //9                                         
-                + ",  IFNULL(a.sModified, '') sModified"  //10                                        
-                + ",  a.dModified "                       //11                                        
-                + ",  IFNULL(d.sProvName, '') sProvName " //12                                        
-                + ",  IFNULL(c.sBrgyName, '') sBrgyName " //13                                        
-                + ",  IFNULL(b.sTownName, '') sTownName " //14                                        
-                + ",  IFNULL(d.sProvIDxx, '') sProvIDxx " //15                                        
-                + ",  REPLACE(CONCAT(IFNULL(a.sHouseNox,''), "                                        
-                + "    IFNULL(a.sAddressx,''),IFNULL(c.sBrgyName,''), "                               
-                + "    IFNULL(b.sTownName,''), IFNULL(d.sProvName,'')), ' ', '') AS trimAddress" //16 
-                + " FROM addresses a   "                                                              
-                + " LEFT JOIN TownCity b ON b.sTownIDxx = a.sTownIDxx "                               
-                + " LEFT JOIN Barangay c ON c.sBrgyIDxx = a.sBrgyIDxx "                               
-                + " LEFT JOIN Province d ON d.sProvIDxx = b.sProvIDxx " ;                             
+        return    "  SELECT      "                                                                       
+                + "  a.sAddrssID " //1                                                                   
+                + ", a.sHouseNox " //2                                                                   
+                + ", a.sAddressx " //3                                                                   
+                + ", a.sTownIDxx " //4                                                                   
+                + ", a.sZippCode " //5                                                                   
+                + ", a.sBrgyIDxx " //6                                                                   
+                + ", a.nLatitude " //7                                                                   
+                + ", a.nLongitud " //8                                                                   
+                + ", a.sRemarksx " //9                                                                   
+                + ", a.sModified " //10                                                                  
+                + ", a.dModified " //11                                                                  
+                + ", IFNULL(d.sProvName, '') sProvName " //12                                            
+                + ", IFNULL(c.sBrgyName, '') sBrgyName " //13                                            
+                + ", IFNULL(b.sTownName, '') sTownName " //14                                            
+                + ", IFNULL(d.sProvIDxx, '') sProvIDxx " //15                                            
+                + ", REPLACE(CONCAT(IFNULL(a.sHouseNox,''),         "                                    
+                + "  IFNULL(a.sAddressx,''),IFNULL(c.sBrgyName,''), "                                    
+                + "  IFNULL(b.sTownName,''), IFNULL(d.sProvName,'')), ' ', '') AS trimAddress   " //16   
+                + "FROM addresses a   "                                                                  
+                + "LEFT JOIN TownCity b ON b.sTownIDxx = a.sTownIDxx "                                   
+                + "LEFT JOIN Barangay c ON c.sBrgyIDxx = a.sBrgyIDxx "                                   
+                + "LEFT JOIN Province d ON d.sProvIDxx = b.sProvIDxx " ;                          
     }
 
     /**
@@ -368,7 +368,11 @@ public class Model_Addresses implements GEntity{
      * @return The Value of this record. 
      */
     public String getHouseNo(){
-        return (String) getValue("sHouseNox");
+        String lsValue = "";
+        if(getValue("sHouseNox") != null){
+            lsValue = String.valueOf(getValue("sHouseNox"));
+        }
+        return lsValue;
     }
     
     /**
@@ -402,7 +406,12 @@ public class Model_Addresses implements GEntity{
      * @return The Value of this record. 
      */
     public String getProvID(){
-        return (String) getValue("sProvIDxx");
+        
+        String lsValue = "";
+        if(getValue("sProvIDxx") != null){
+            lsValue = String.valueOf(getValue("sProvIDxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -419,7 +428,12 @@ public class Model_Addresses implements GEntity{
      * @return The Value of this record. 
      */
     public String getTownID(){
-        return (String) getValue("sTownIDxx");
+        
+        String lsValue = "";
+        if(getValue("sTownIDxx") != null){
+            lsValue = String.valueOf(getValue("sTownIDxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -436,7 +450,12 @@ public class Model_Addresses implements GEntity{
      * @return The Value of this record. 
      */
     public String getZippCode(){
-        return (String) getValue("sZippCode");
+        
+        String lsValue = "";
+        if(getValue("sZippCode") != null){
+            lsValue = String.valueOf(getValue("sZippCode"));
+        }
+        return lsValue;
     }
     
     /**
@@ -453,7 +472,13 @@ public class Model_Addresses implements GEntity{
      * @return The Value of this record. 
      */
     public String getBrgyID(){
-        return (String) getValue("sBrgyIDxx");
+        
+        
+        String lsValue = "";
+        if(getValue("sBrgyIDxx") != null){
+            lsValue = String.valueOf(getValue("sBrgyIDxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -462,15 +487,15 @@ public class Model_Addresses implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public JSONObject setLatitude(String fsValue){
-        return setValue("nLatitude", fsValue);
+    public JSONObject setLatitude(Double fdValue){
+        return setValue("nLatitude", fdValue);
     }
     
     /** 
      * @return The Value of this record. 
      */
-    public String getLatitude(){
-        return (String) getValue("nLatitude");
+    public Double getLatitude(){
+        return (Double) getValue("nLatitude");
     }
     
     /**
@@ -479,15 +504,15 @@ public class Model_Addresses implements GEntity{
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public JSONObject setLongitud(String fsValue){
-        return setValue("nLongitud", fsValue);
+    public JSONObject setLongitud(Double fdValue){
+        return setValue("nLongitud", fdValue);
     }
     
     /** 
      * @return The Value of this record. 
      */
-    public String getLongitud(){
-        return (String) getValue("nLongitud");
+    public Double getLongitud(){
+        return (Double) getValue("nLongitud");
     }
     
     /**

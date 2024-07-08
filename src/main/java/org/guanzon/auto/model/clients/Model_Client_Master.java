@@ -9,7 +9,10 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
@@ -320,52 +323,132 @@ public class Model_Client_Master implements GEntity{
         return psMessage;
     }
     
+//    public JSONObject getColValues(){
+//        JSONObject jObj = new JSONObject();
+//        try {
+//            int lnRow = poEntity.getMetaData().getColumnCount();
+//            String lsValue = "";
+//            for (int lnCtr = 1; lnCtr <= lnRow; lnCtr++){
+//                System.out.println("Column index: " + (lnCtr) + " --> Label: " + poEntity.getMetaData().getColumnLabel(lnCtr));
+//                if(getValue(poEntity.getMetaData().getColumnLabel(lnCtr)) == null){
+//                    lsValue ="";
+//                } else {
+//                   lsValue = String.valueOf(getValue(poEntity.getMetaData().getColumnLabel(lnCtr)));
+//                }
+//                jObj.put(lnCtr,lsValue );
+//            }
+//            jObj.put("pnEditMode",String.valueOf(pnEditMode));
+//        } catch (SQLException ex) {
+//            Logger.getLogger(Model_Client_Master.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        
+//        return jObj;
+//    }
+//    
+//    public JSONObject updateColValues(JSONObject masterObject ){
+//        JSONObject jObj = new JSONObject();
+//        String tempValue = "";
+//        
+//        try {
+//            for (Object key : masterObject.keySet()) {
+//                Object value = masterObject.get(key);
+//                if(value == null){
+//                    tempValue = "";
+//                } else {
+//                    tempValue = String.valueOf(value);
+//                }
+//                
+//                if(!key.toString().equals("pnEditMode")){
+//                    switch(poEntity.getMetaData().getColumnType(Integer.valueOf(key.toString()))){
+//                        case Types.CHAR:
+//                        case Types.VARCHAR:
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), tempValue);
+//                            break;
+//                        case Types.DATE:
+//                        case Types.TIMESTAMP:
+//                            if(String.valueOf(tempValue).isEmpty()){
+//                                tempValue = psDefaultDate;
+//                            } else {
+//                                tempValue = String.valueOf(value);
+//                            }
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), SQLUtil.toDate(tempValue, SQLUtil.FORMAT_SHORT_DATE) );
+//                            break;
+//                        case Types.INTEGER:
+//                            if(String.valueOf(tempValue).isEmpty()){
+//                                tempValue = "0";
+//                            } else {
+//                                tempValue = String.valueOf(value);
+//                            }
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), Integer.valueOf(tempValue));
+//                            break;
+//                        case Types.DECIMAL:
+//                        case Types.DOUBLE:
+//                            if(String.valueOf(tempValue).isEmpty()){
+//                                tempValue = "0.00";
+//                            } else {
+//                                tempValue = String.valueOf(value);
+//                            }
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), Double.valueOf(tempValue));
+//                            break;
+//                        default:
+//                            poEntity.updateObject(Integer.valueOf(key.toString()), tempValue);
+//                            break;
+//                    }
+//                }
+//                
+//                System.out.println(key.toString() + " : " + tempValue);
+//                tempValue = "";
+//            }
+//        } catch (SQLException ex) {
+//            Logger.getLogger(Model_Client_Master.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return jObj;
+//    }
+    
     public String getSQL(){
-        return    " SELECT "                                                                                              
-                + "  IFNULL(a.sClientID,'') sClientID " //1                                                             
-                + ", IFNULL(a.sLastName,'') sLastName " //2                                                             
-                + ", IFNULL(a.sFrstName,'') sFrstName " //3                                                             
-                + ", IFNULL(a.sMiddName,'') sMiddName " //4                                                             
-                + ", IFNULL(a.sMaidenNm,'') sMaidenNm " //5                                                             
-                + ", IFNULL(a.sSuffixNm,'') sSuffixNm " //6                                                             
-                + ", IFNULL(a.sTitlexxx,'') sTitlexxx " //7                                                             
-                + ", IFNULL(a.cGenderCd,'') cGenderCd " //8                                                             
-                + ", IFNULL(a.cCvilStat,'') cCvilStat " //9                                                             
-                + ", IFNULL(a.sCitizenx,'') sCitizenx " //10                                                            
-                + ", a.dBirthDte "                       //11                                                                                  
-                + ", IFNULL(a.sBirthPlc,'') sBirthPlc " //12                                                            
-                + ", IFNULL(a.sTaxIDNox,'') sTaxIDNox " //13                                                            
-                + ", IFNULL(a.sLTOIDxxx,'') sLTOIDxxx " //14                                                            
-                + ", IFNULL(a.sAddlInfo,'') sAddlInfo " //15                                                            
-                + ", IFNULL(a.sCompnyNm,'') sCompnyNm " //16                                                            
-                + ", IFNULL(a.sClientNo,'') sClientNo " //17                                                            
-                + ", IFNULL(a.cClientTp,'') cClientTp " //18                                                            
-                + ", IFNULL(a.cRecdStat,'') cRecdStat " //19                                                            
-                + ", IFNULL(a.sEntryByx,'') sEntryByx " //20                                                            
-                + ", a.dEntryDte"                       //21                                                                                  
-                + ", IFNULL(a.sModified,'') sModified " //22                                                            
-                + ", a.dModified "                       //23                                                                                  
-                + ", IFNULL(a.sSpouseID,'') sSpouseID " //24                                                            
-                + ", IFNULL(b.sCntryNme, '') sCntryNme "   //25                                                         
-                + ", TRIM(CONCAT(c.sTownName, ', ', d.sProvName)) sTownName"   //26                                     
-                + ", TRIM(CONCAT(a.sLastName, ', ', a.sFrstName, ' ', a.sSuffixNm, ' ', a.sMiddName)) sCustName"   //27 
-                + ", TRIM(CONCAT(e.sLastName, ', ', e.sFrstName)) sSpouseNm"   //28                                     
-                + ", IFNULL(CONCAT( IFNULL(CONCAT(g.sHouseNox,' ') , ''), "                                             
-                + "    IFNULL(CONCAT(g.sAddressx,' ') , ''), "                                                          
-                + "    IFNULL(CONCAT(h.sBrgyName,' '), ''),  "                                                          
-                + "    IFNULL(CONCAT(i.sTownName, ', '),''), "                                                          
-                + "    IFNULL(CONCAT(j.sProvName),'') )	, '') AS sAddressx   "  //29  
-                //+ " CASE WHEN a.cClientTp = '0' THEN 'CLIENT' ELSE 'COMPANY' END AS cClientTp "  //30                                  
-                + " FROM " + getTable() + " a"                                                                          
-                + " LEFT JOIN Country b ON a.sCitizenx = b.sCntryCde"                                                   
-                + " LEFT JOIN TownCity c ON a.sBirthPlc = c.sTownIDxx"                                                  
-                + " LEFT JOIN Province d ON c.sProvIDxx = d.sProvIDxx"                                                  
-                + " LEFT JOIN client_master e ON e.sClientID = a.sSpouseID"                                             
-                + " LEFT JOIN client_address f ON f.sClientID = a.sClientID AND f.cPrimaryx = '1'"                      
-                + " LEFT JOIN addresses g ON g.sAddrssID = f.sAddrssID"                                                 
-                + " LEFT JOIN barangay h ON h.sBrgyIDxx = g.sBrgyIDxx"                                                  
-                + " LEFT JOIN towncity i ON i.sTownIDxx = g.sTownIDxx"                                                  
-                + " LEFT JOIN province j ON j.sProvIDxx = i.sProvIDxx" ;                                                
+        return    "  SELECT      "                                                                                      
+                + "  a.sClientID "  //1                                                                                 
+                + ", a.sLastName "  //2                                                                                 
+                + ", a.sFrstName "  //3                                                                                 
+                + ", a.sMiddName "  //4                                                                                 
+                + ", a.sMaidenNm "  //5                                                                                 
+                + ", a.sSuffixNm "  //6                                                                                 
+                + ", a.sTitlexxx "  //7                                                                                 
+                + ", a.cGenderCd "  //8                                                                                 
+                + ", a.cCvilStat "  //9                                                                                 
+                + ", a.sCitizenx "  //10                                                                                
+                + ", a.dBirthDte "  //11                                                                                
+                + ", a.sBirthPlc "  //12                                                                                
+                + ", a.sTaxIDNox "  //13                                                                                
+                + ", a.sLTOIDxxx "  //14                                                                                
+                + ", a.sAddlInfo "  //15                                                                                
+                + ", a.sCompnyNm "  //16                                                                                
+                + ", a.sClientNo "  //17                                                                                
+                + ", a.sSpouseID "  //18                                                                                
+                + ", a.cClientTp "  //19                                                                                
+                + ", a.cRecdStat "  //20                                                                                
+                + ", a.sEntryByx "  //21                                                                                
+                + ", a.dEntryDte "  //22                                                                                
+                + ", a.sModified "  //23                                                                                
+                + ", a.dModified "  //24                                                                                
+                + ", IFNULL(b.sCntryNme, '') sCntryNme   " //25                                                         
+                + ", TRIM(CONCAT(c.sTownName, ', ', d.sProvName)) sTownName   "   //26                
+                + ", e.sCompnyNm    sSpouseNm " //27
+                + ",  IFNULL(CONCAT( IFNULL(CONCAT(g.sHouseNox,' ') , ''),    "                                         
+                + "   IFNULL(CONCAT(g.sAddressx,' ') , ''),                   "                                         
+                + "   IFNULL(CONCAT(h.sBrgyName,' '), ''),                    "                                         
+                + "   IFNULL(CONCAT(i.sTownName, ', '),''),                   "                                         
+                + "   IFNULL(CONCAT(j.sProvName),'') )	, '') AS sAddressx    "  //28                                  
+                + "FROM client_master  a                                      "                                         
+                + "LEFT JOIN Country b ON a.sCitizenx = b.sCntryCde           "                                         
+                + "LEFT JOIN TownCity c ON a.sBirthPlc = c.sTownIDxx          "                                         
+                + "LEFT JOIN Province d ON c.sProvIDxx = d.sProvIDxx          "                                         
+                + "LEFT JOIN client_master e ON e.sClientID = a.sSpouseID     "                                         
+                + "LEFT JOIN client_address f ON f.sClientID = a.sClientID AND f.cPrimaryx = '1' "                      
+                + "LEFT JOIN addresses g ON g.sAddrssID = f.sAddrssID         "                                         
+                + "LEFT JOIN barangay h ON h.sBrgyIDxx = g.sBrgyIDxx          "                                         
+                + "LEFT JOIN towncity i ON i.sTownIDxx = g.sTownIDxx          "                                         
+                + "LEFT JOIN province j ON j.sProvIDxx = i.sProvIDxx          "  ;                                      
     }
     
     /**
@@ -491,7 +574,11 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getTitle(){
-        return (String) getValue("sTitlexxx");
+        String lsValue = "";
+        if(getValue("sTitlexxx") != null){
+            lsValue = String.valueOf(getValue("sTitlexxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -509,7 +596,11 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getGender(){
-        return (String) getValue("cGenderCd");
+        String lsValue = "";
+        if(getValue("cGenderCd") != null){
+            lsValue = String.valueOf(getValue("cGenderCd"));
+        }
+        return lsValue;
     }
     
     /**
@@ -527,7 +618,11 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getCvilStat(){
-        return (String) getValue("cCvilStat");
+        String lsValue = "";
+        if(getValue("cCvilStat") != null){
+            lsValue = String.valueOf(getValue("cCvilStat"));
+        }
+        return lsValue;
     }
     
     /**
@@ -604,7 +699,11 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getTaxIDNo(){
-        return (String) getValue("sTaxIDNox");
+        String lsValue = "";
+        if(getValue("sTaxIDNox") != null){
+            lsValue = String.valueOf(getValue("sTaxIDNox"));
+        }
+        return lsValue;
     }
     
     /**
@@ -622,7 +721,11 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getLTOID(){
-        return (String) getValue("sLTOIDxxx");
+        String lsValue = "";
+        if(getValue("sLTOIDxxx") != null){
+            lsValue = String.valueOf(getValue("sLTOIDxxx"));
+        }
+        return lsValue;
     }
     
     /**
@@ -676,7 +779,11 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getClientNo(){
-        return (String) getValue("sClientNo");
+        String lsValue = "";
+        if(getValue("sClientNo") != null){
+            lsValue = String.valueOf(getValue("sClientNo"));
+        }
+        return lsValue;
     }
     
     /**
@@ -694,7 +801,11 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getClientTp(){
-        return (String) getValue("cClientTp");
+        String lsValue = "";
+        if(getValue("cClientTp") != null){
+            lsValue = String.valueOf(getValue("cClientTp"));
+        }
+        return lsValue;
     }
     
     /**
@@ -712,7 +823,11 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getRecdStat(){
-        return (String) getValue("cRecdStat");
+        String lsValue = "";
+        if(getValue("cRecdStat") != null){
+            lsValue = String.valueOf(getValue("cRecdStat"));
+        }
+        return lsValue;
     }
     
     /**
@@ -893,5 +1008,9 @@ public class Model_Client_Master implements GEntity{
      */
     public String getAddressx(){
         return (String) getValue("sAddressx");
+    }
+
+    public JSONObject updateColValues(JSONObject jsonObject) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
