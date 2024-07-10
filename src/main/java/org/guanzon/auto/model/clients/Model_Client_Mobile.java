@@ -177,7 +177,7 @@ public class Model_Client_Mobile  implements GEntity{
         poJSON = new JSONObject();
 
         String lsSQL = MiscUtil.addCondition(getSQL(), "sMobileID = " + SQLUtil.toSQL(fsValue));
-        System.out.println(lsSQL);
+        //System.out.println(lsSQL);
         
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -250,7 +250,6 @@ public class Model_Client_Mobile  implements GEntity{
                 JSONObject loJSON = loOldEntity.openRecord(this.getMobileID());
                 setModifiedDte(poGRider.getServerDate());
                 setModifiedBy(poGRider.getUserID());
-                setSubscrbr(CommonUtils.classifyNetwork(getMobileNo()));
                 
                 if ("success".equals((String) loJSON.get("result"))){
                     //replace the condition based on the primary key column of the record

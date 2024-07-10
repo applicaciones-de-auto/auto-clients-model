@@ -387,7 +387,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     }
     
     public String getSQL(){
-        return            "  SELECT      "                                                                                               
+        return            "  SELECT "                                                                                               
                         + "  a.sSerialID " //1                                                                                           
                         + ", a.sBranchCD " //2                                                                                           
                         + ", a.sFrameNox " //3                                                                                           
@@ -424,50 +424,48 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                         + ", c.sDescript " //34                                                                                                                                                                                   
                         + ", h.sCompnyNm " //35                                                                                          
                         + ", i.sCompnyNm " //36                                                                                          
-                        + ", IFNULL(CONCAT(IFNULL(CONCAT(jj.sHouseNox,' ') , ''), IFNULL(CONCAT(jj.sAddressx,' ') , ''),      "              
-                        + "	IFNULL(CONCAT(l.sBrgyName,' '), ''),                                                          "              
-                        + "	IFNULL(CONCAT(k.sTownName, ', '),''),                                                         "              
-                        + "	IFNULL(CONCAT(m.sProvName),'') )	, '') AS sOwnerAdd                                    " //37         
-                        + "	                                                                                              "              
-                        + ", IFNULL(CONCAT(IFNULL(CONCAT(nn.sHouseNox,' ') , ''), IFNULL(CONCAT(nn.sAddressx,' ') , ''),      "              
-                        + "	IFNULL(CONCAT(p.sBrgyName,' '), ''),                                                          "              
-                        + "	IFNULL(CONCAT(o.sTownName, ', '),''),                                                         "              
-                        + "	IFNULL(CONCAT(q.sProvName),'') )	, '') AS sCoOwnerA                                    " //38         
-                        + "	                                                                                              "              
-                        + ",CASE                                                                                          "              
-                        + "  WHEN a.cSoldStat = '0' THEN 'NON SALES CUSTOMER'                                             "              
-                        + "  WHEN a.cSoldStat = '1' THEN 'AVAILABLE FOR SALE'                                             "              
-                        + "  WHEN a.cSoldStat = '2' THEN 'VSP'                                                            "              
-                        + "  WHEN a.cSoldStat = '3' THEN 'SOLD'                                                           "              
-                        + " ELSE ''                                                                                       "              
-                        + " END AS sVhclStat                                                                              " //39         
-                        + " , r.sReferNox                                                                                 " //40         
-                        + " , r.dTransact                                                                                 " //41         
-                        + " , s.sCompnyNm                                                                                 " //42         
-                        + "FROM vehicle_serial a                                                                          "              
-                        + "LEFT JOIN vehicle_serial_registration b ON a.sSerialID = b.sSerialID                           "              
-                        + "LEFT JOIN vehicle_master c ON c.sVhclIDxx = a.sVhclIDxx                                        "              
-                        + "LEFT JOIN vehicle_make   d ON d.sMakeIDxx = c.sMakeIDxx                                        "              
-                        + "LEFT JOIN vehicle_model  e ON e.sModelIDx = c.sModelIDx                                        "              
-                        + "LEFT JOIN vehicle_type   f ON f.sTypeIDxx = c.sTypeIDxx                                        "              
-                        + "LEFT JOIN vehicle_color  g ON g.sColorIDx = c.sColorIDx                                        "              
-                        + "LEFT JOIN client_master  h ON h.sClientID = a.sClientID                                        "              
-                        + "LEFT JOIN client_master  i ON i.sClientID = a.sCoCltIDx                                        "              
+                        + ", IFNULL(CONCAT(IFNULL(CONCAT(jj.sHouseNox,' ') , ''), IFNULL(CONCAT(jj.sAddressx,' ') , ''), "              
+                        + "	IFNULL(CONCAT(l.sBrgyName,' '), ''), "              
+                        + "	IFNULL(CONCAT(k.sTownName, ', '),''), "              
+                        + "	IFNULL(CONCAT(m.sProvName),'') ), '') AS sOwnerAdd " //37                     
+                        + ", IFNULL(CONCAT(IFNULL(CONCAT(nn.sHouseNox,' ') , ''), IFNULL(CONCAT(nn.sAddressx,' ') , ''), "              
+                        + "	IFNULL(CONCAT(p.sBrgyName,' '), ''), "              
+                        + "	IFNULL(CONCAT(o.sTownName, ', '),''), "              
+                        + "	IFNULL(CONCAT(q.sProvName),''))	, '') AS sCoOwnerA " //38                      
+                        + ",CASE "              
+                        + "  WHEN a.cSoldStat = '0' THEN 'NON SALES CUSTOMER' "              
+                        + "  WHEN a.cSoldStat = '1' THEN 'AVAILABLE FOR SALE' "              
+                        + "  WHEN a.cSoldStat = '2' THEN 'VSP' "              
+                        + "  WHEN a.cSoldStat = '3' THEN 'SOLD' "              
+                        + " ELSE '' "              
+                        + " END AS sVhclStat " //39         
+                        + " , r.sReferNox " //40         
+                        + " , r.dTransact " //41         
+                        + " , s.sCompnyNm " //42         
+                        + "FROM vehicle_serial a "              
+                        + "LEFT JOIN vehicle_serial_registration b ON a.sSerialID = b.sSerialID "              
+                        + "LEFT JOIN vehicle_master c ON c.sVhclIDxx = a.sVhclIDxx "              
+                        + "LEFT JOIN vehicle_make   d ON d.sMakeIDxx = c.sMakeIDxx "              
+                        + "LEFT JOIN vehicle_model  e ON e.sModelIDx = c.sModelIDx "              
+                        + "LEFT JOIN vehicle_type   f ON f.sTypeIDxx = c.sTypeIDxx "              
+                        + "LEFT JOIN vehicle_color  g ON g.sColorIDx = c.sColorIDx "              
+                        + "LEFT JOIN client_master  h ON h.sClientID = a.sClientID "              
+                        + "LEFT JOIN client_master  i ON i.sClientID = a.sCoCltIDx "              
                          /* Owner Address */                                                                                             
-                        + "LEFT JOIN client_address j ON j.sClientID = a.sClientID AND j.cPrimaryx = '1'                  "              
-                        + "LEFT JOIN addresses     jj ON jj.sAddrssID = j.sAddrssID                                       "              
-                        + "LEFT JOIN TownCity       k ON k.sTownIDxx = jj.sTownIDxx                                       "              
-                        + "LEFT JOIN barangay       l ON l.sBrgyIDxx = jj.sBrgyIDxx AND l.sTownIDxx = jj.sTownIDxx        "              
-                        + "LEFT JOIN Province       m ON m.sProvIDxx = k.sProvIDxx                                        "              
+                        + "LEFT JOIN client_address j ON j.sClientID = a.sClientID AND j.cPrimaryx = '1' "              
+                        + "LEFT JOIN addresses     jj ON jj.sAddrssID = j.sAddrssID "              
+                        + "LEFT JOIN TownCity       k ON k.sTownIDxx = jj.sTownIDxx "              
+                        + "LEFT JOIN barangay       l ON l.sBrgyIDxx = jj.sBrgyIDxx AND l.sTownIDxx = jj.sTownIDxx "              
+                        + "LEFT JOIN Province       m ON m.sProvIDxx = k.sProvIDxx "              
                          /* Co Owner Address */                                                                                          
-                        + "LEFT JOIN client_address n ON n.sClientID = a.sCoCltIDx AND n.cPrimaryx = '1'                  "              
-                        + "LEFT JOIN addresses     nn ON nn.sAddrssID = n.sAddrssID                                       "              
-                        + "LEFT JOIN TownCity       o ON o.sTownIDxx = nn.sTownIDxx                                       "              
-                        + "LEFT JOIN barangay       p ON p.sBrgyIDxx = nn.sBrgyIDxx AND p.sTownIDxx = nn.sTownIDxx        "              
-                        + "LEFT JOIN Province       q ON q.sProvIDxx = o.sProvIDxx                                        "              
+                        + "LEFT JOIN client_address n ON n.sClientID = a.sCoCltIDx AND n.cPrimaryx = '1' "              
+                        + "LEFT JOIN addresses     nn ON nn.sAddrssID = n.sAddrssID "              
+                        + "LEFT JOIN TownCity       o ON o.sTownIDxx = nn.sTownIDxx "              
+                        + "LEFT JOIN barangay       p ON p.sBrgyIDxx = nn.sBrgyIDxx AND p.sTownIDxx = nn.sTownIDxx "              
+                        + "LEFT JOIN Province       q ON q.sProvIDxx = o.sProvIDxx "              
                          /* UDR INFO */                                                                                                  
-                        + "LEFT JOIN udr_master     r ON r.sSerialID = a.sSerialID  AND r.sClientID = a.sClientID AND r.cTranStat = '1' "
-                        + "LEFT JOIN client_master  s ON s.sClientID = r.sClientID                                                      ";
+                        + "LEFT JOIN udr_master     r ON r.sSerialID = a.sSerialID AND r.sClientID = a.sClientID AND r.cTranStat = '1' "
+                        + "LEFT JOIN client_master  s ON s.sClientID = r.sClientID ";
                 
     }                                                                            
 

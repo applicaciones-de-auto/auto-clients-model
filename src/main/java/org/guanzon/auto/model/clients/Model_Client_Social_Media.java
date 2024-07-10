@@ -177,7 +177,7 @@ public class Model_Client_Social_Media implements GEntity{
         poJSON = new JSONObject();
 
         String lsSQL = MiscUtil.addCondition(getSQL(), "sSocialID = " + SQLUtil.toSQL(fsValue));
-        System.out.println(lsSQL);
+        //System.out.println(lsSQL);
         
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 

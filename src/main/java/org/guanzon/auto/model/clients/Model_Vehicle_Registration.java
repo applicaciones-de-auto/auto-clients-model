@@ -387,7 +387,7 @@ public class Model_Vehicle_Registration implements GEntity {
     }
     
     public String getSQL(){
-        return    "  SELECT     "                        
+        return    "  SELECT "                        
                 + "  a.sSerialID  " //1   
                 + ", a.sCSRValNo  " //2   
                 + ", a.sPNPClrNo  " //3   

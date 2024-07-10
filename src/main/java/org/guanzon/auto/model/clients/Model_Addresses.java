@@ -50,7 +50,7 @@ public class Model_Addresses implements GEntity{
     private void initialize(){
         
         try {
-            System.out.println("path = " + System.getProperty("sys.default.path.metadata") + XML);
+            //System.out.println("path = " + System.getProperty("sys.default.path.metadata") + XML);
             poEntity = MiscUtil.xml2ResultSet(System.getProperty("sys.default.path.metadata") + XML, getTable());
             
             poEntity.last();
@@ -143,7 +143,7 @@ public class Model_Addresses implements GEntity{
             poJSON = new JSONObject();
             poJSON.put("result", "success");
             poJSON.put("value", getValue(fnColumn));
-            System.out.println("poJSON = " + poJSON);
+            //System.out.println("poJSON = " + poJSON);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -184,7 +184,7 @@ public class Model_Addresses implements GEntity{
         poJSON = new JSONObject();
         
         String lsSQL = MiscUtil.addCondition(getSQL(), "a.sAddrssID = " + SQLUtil.toSQL(fsValue));
-        System.out.println(lsSQL);
+        //System.out.println(lsSQL);
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
