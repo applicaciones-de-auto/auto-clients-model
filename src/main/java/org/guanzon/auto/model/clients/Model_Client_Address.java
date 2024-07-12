@@ -63,8 +63,8 @@ public class Model_Client_Address implements GEntity{
             MiscUtil.initRowSet(poEntity);      
             poEntity.updateString("cOfficexx", Logical.NO);
             poEntity.updateString("cProvince", Logical.NO);
-            poEntity.updateString("cBillingx", Logical.NO);
-            poEntity.updateString("cShipping", Logical.NO);
+//            poEntity.updateString("cBillingx", Logical.NO);
+//            poEntity.updateString("cShipping", Logical.NO);
             poEntity.updateString("cCurrentx", Logical.NO);
             poEntity.updateString("cPrimaryx", Logical.NO);
             poEntity.updateString("cRecdStat", RecordStatus.ACTIVE);
@@ -185,14 +185,19 @@ public class Model_Client_Address implements GEntity{
         poJSON.put("message", "New record success.");
         return poJSON;
     }
-
+    
     @Override
-    public JSONObject openRecord(String fsValue) {
+    public JSONObject openRecord(String string) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public JSONObject openRecord(String fsValue, String fsClientID) {
         //System.out.println("----------------------LOAD CLIENT ADDRESS---------------------------");
         poJSON = new JSONObject();
         psOrigAddressID = fsValue;
 
-        String lsSQL = MiscUtil.addCondition(getSQL(), "a.sAddrssID = " + SQLUtil.toSQL(fsValue));
+        String lsSQL = MiscUtil.addCondition(getSQL(), " a.sAddrssID = " + SQLUtil.toSQL(fsValue) 
+                                                         + " AND a.sClientID = " + SQLUtil.toSQL(fsClientID));
         //System.out.println(lsSQL);
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
@@ -255,7 +260,7 @@ public class Model_Client_Address implements GEntity{
                 setModifiedBy(poGRider.getUserID());
                 setModifiedDte(poGRider.getServerDate());
                 //replace with the primary key column info
-                JSONObject loJSON = loOldEntity.openRecord(psOrigAddressID);
+                JSONObject loJSON = loOldEntity.openRecord(psOrigAddressID,this.getClientID());
                 
                 if ("success".equals((String) loJSON.get("result"))){
                     //replace the condition based on the primary key column of the record
