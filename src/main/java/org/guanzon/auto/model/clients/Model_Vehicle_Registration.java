@@ -219,9 +219,6 @@ public class Model_Vehicle_Registration implements GEntity {
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
 
-        //replace with the primary key column info
-        //setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()));
-
         poJSON = new JSONObject();
         poJSON.put("result", "success");
         return poJSON;
@@ -281,7 +278,7 @@ public class Model_Vehicle_Registration implements GEntity {
                 //replace with the primary key column info
                 //setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()));
 
-                lsSQL = makeSQL();
+                lsSQL = getSQL();
 
                 if (!lsSQL.isEmpty()) {
                     if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -387,23 +384,22 @@ public class Model_Vehicle_Registration implements GEntity {
     }
     
     public String getSQL(){
-        return    "  SELECT "                        
-                + "  a.sSerialID  " //1   
-                + ", a.sCSRValNo  " //2   
-                + ", a.sPNPClrNo  " //3   
-                + ", a.sCRNoxxxx  " //4   
-                + ", a.sCRENoxxx  " //5   
-                + ", a.sRegORNox  " //6   
-                + ", a.sFileNoxx  " //7   
-                + ", a.sPlateNox  " //8   
-                + ", a.dRegister  " //9   
-                + ", a.sPlaceReg  " //10  
-                + ", a.sEntryByx  " //11  
-                + ", a.dEntryDte  " //12  
-                + ", a.sModified  " //13  
-                + ", a.dModified  " //14                
-                + "FROM vehicle_serial_registration a "                    
-                + "LEFT JOIN vehicle_serial b ON b.sSerialID = a.sSerialID ";  
+        return    "  SELECT "                                         
+                + "  sSerialID  " //1                  
+                + ", sCSRValNo  " //2                  
+                + ", sPNPClrNo  " //3                  
+                + ", sCRNoxxxx  " //4                  
+                + ", sCRENoxxx  " //5                  
+                + ", sRegORNox  " //6                  
+                + ", sFileNoxx  " //7                  
+                + ", sPlateNox  " //8                  
+                + ", dRegister  " //9                  
+                + ", sPlaceReg  " //10                 
+                + ", sEntryByx  " //11                 
+                + ", dEntryDte  " //12                 
+                + ", sModified  " //13                 
+                + ", dModified  " //14                 
+                + "FROM vehicle_serial_registration " ;
     }                                                                            
 
     /**
