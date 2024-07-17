@@ -27,7 +27,8 @@ import org.json.simple.JSONObject;
 public class Model_Vehicle_Serial_Master implements GEntity {
 
     final String XML = "Model_Vehicle_Serial_Master.xml";
-
+    private final String psDefaultDate = "1900-01-01";
+    
     GRider poGRider;                //application driver
     CachedRowSet poEntity;          //rowset
     JSONObject poJSON;              //json container
@@ -58,6 +59,8 @@ public class Model_Vehicle_Serial_Master implements GEntity {
 
             MiscUtil.initRowSet(poEntity);
             //poEntity.updateString("cRecdStat", RecordStatus.ACTIVE);
+            poEntity.updateInt("nYearModl", 0);
+            poEntity.updateObject("dRegister", SQLUtil.toDate(psDefaultDate, SQLUtil.FORMAT_SHORT_DATE));
 
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
@@ -241,7 +244,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
         String lsSQL = getSQL(); // MiscUtil.makeSelect(this);
 
         //replace the condition based on the primary key column of the record
-        lsSQL = MiscUtil.addCondition(lsSQL, " sSerialID = " + SQLUtil.toSQL(fsValue));
+        lsSQL = MiscUtil.addCondition(lsSQL, " a.sSerialID = " + SQLUtil.toSQL(fsValue));
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -274,7 +277,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      */
     @Override
     public JSONObject saveRecord() {
-        String lsExclude = "sMakeIDxx»sMakeDesc»sModelIDx»sModelDsc»sTypeIDxx»sTypeDesc»sColorIDx»sColorDsc»sTransMsn»nYearModl»sDescript"
+        String lsExclude = "sPlateNox»dRegister»sPlaceReg»sMakeIDxx»sMakeDesc»sModelIDx»sModelDsc»sTypeIDxx»sTypeDesc»sColorIDx»sColorDsc»sTransMsn»nYearModl»sDescript"
                             + "»sOwnerNmx»sCOwnerNm»sOwnerAdd»sCOwnerAd»sVhclStat»sUdrNoxxx»sUdrDatex»sBuyerNmx"; 
         
         poJSON = new JSONObject();
@@ -282,18 +285,17 @@ public class Model_Vehicle_Serial_Master implements GEntity {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             String lsSQL;
             // Assuming poGRider.getServerDate() returns a Timestamp
-            Timestamp ltimestamp = poGRider.getServerDate();
+//            Timestamp ltimestamp = poGRider.getServerDate();
             // Convert Timestamp to Date
             //Date date = new Date(ltimestamp.getTime());
-            
             
             if (pnEditMode == EditMode.ADDNEW) {
                 //replace with the primary key column info
                 setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()+"VS"));
                 setEntryBy(poGRider.getUserID());
-                setEntryDte(ltimestamp);
+                setEntryDte(poGRider.getServerDate());
                 setModified(poGRider.getUserID());
-                setModifiedDte(ltimestamp);
+                setModifiedDte(poGRider.getServerDate());
                 
                 lsSQL = MiscUtil.makeSQL(this, lsExclude);
 
@@ -317,9 +319,9 @@ public class Model_Vehicle_Serial_Master implements GEntity {
 
                 if ("success".equals((String) loJSON.get("result"))) {
                     setModified(poGRider.getUserID());
-                    setModifiedDte(ltimestamp);
+                    setModifiedDte(poGRider.getServerDate());
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSerialID = " + SQLUtil.toSQL(this.getSerialID()));
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSerialID = " + SQLUtil.toSQL(this.getSerialID()),lsExclude);
 
                     if (!lsSQL.isEmpty()) {
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -803,13 +805,14 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     }
     
     /**
-     * Sets the date and time the record was modified.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setEntryDte(Timestamp fdValue) {
-        return setValue("dEntryDte", fdValue);
+    public boolean setEntryDte(java.util.Date fdValue){
+        setValue("dEntryDte", fdValue);
+        return true;
     }
 
     /**
@@ -837,13 +840,14 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     }
     
     /**
-     * Sets the date and time the record was modified.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setModifiedDte(Timestamp fdValue) {
-        return setValue("dModified", fdValue);
+    public boolean setModifiedDte(java.util.Date fdValue){
+        setValue("dModified", fdValue);
+        return true;
     }
 
     /**
@@ -871,20 +875,21 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     }
     
     /**
-     * Sets the date and time the record was modified.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setRegisterDte(Date fdValue) {
-        return setValue("dRegister", fdValue);
+    public boolean setRegisterDte(java.util.Date fdValue){
+        setValue("dRegister", fdValue);
+        return true;
     }
 
     /**
      * @return The date and time the record was modified.
      */
-    public Date getRegisterDte() {
-        return (Date) getValue("dRegister");
+    public java.util.Date getRegisterDte() {
+        return (java.util.Date) getValue("dRegister");
     }
     
     /**
@@ -1071,7 +1076,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @return The Value of this record.
      */
     public Integer getYearModl() {
-        return (Integer) getValue("nYearModl");
+        return Integer.parseInt(String.valueOf(getValue("nYearModl")));
     }
     
     /**

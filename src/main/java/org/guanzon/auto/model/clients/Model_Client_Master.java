@@ -876,7 +876,7 @@ public class Model_Client_Master implements GEntity{
     /**
      * Sets the value of this record.
      * 
-     * @param fsValue 
+     * @param fdValue 
      * @return  True if the record assignment is successful.
      */
     public boolean setModifiedDte(Date fdValue){
