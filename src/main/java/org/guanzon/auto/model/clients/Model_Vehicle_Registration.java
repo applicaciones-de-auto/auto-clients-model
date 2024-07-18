@@ -6,16 +6,16 @@
 package org.guanzon.auto.model.clients;
 
 import java.lang.reflect.Method;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import javax.sql.rowset.CachedRowSet;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GEntity;
 import org.json.simple.JSONObject;
 
@@ -552,7 +552,7 @@ public class Model_Vehicle_Registration implements GEntity {
      * @param fdValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setRegisterDte(java.util.Date fdValue){
+    public boolean setRegisterDte(Date fdValue){
         setValue("dRegister", fdValue);
         return true;
     }
@@ -560,8 +560,12 @@ public class Model_Vehicle_Registration implements GEntity {
     /**
      * @return The Value of this record.
      */
-    public java.util.Date getRegisterDte() {
-        return (java.util.Date) getValue("dRegister");
+    public Date getRegisterDte() {
+        Date date = null;
+        if(!getValue("dRegister").toString().isEmpty()){
+            date = CommonUtils.toDate(getValue("dRegister").toString());
+        }
+        return date;
     }
     
     /**

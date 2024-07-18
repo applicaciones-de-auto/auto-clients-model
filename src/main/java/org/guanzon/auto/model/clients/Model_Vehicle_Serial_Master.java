@@ -6,13 +6,12 @@
 package org.guanzon.auto.model.clients;
 
 import java.lang.reflect.Method;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.sql.Types;
-import java.time.LocalDate;
+import java.util.Date;
 import javax.sql.rowset.CachedRowSet;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -293,7 +292,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                 //replace with the primary key column info
                 setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()+"VS"));
                 setEntryBy(poGRider.getUserID());
-                setEntryDte(poGRider.getServerDate());
+                setEntryDte(poGRider.getServerDate()); 
                 setModified(poGRider.getUserID());
                 setModifiedDte(poGRider.getServerDate());
                 
@@ -487,7 +486,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                 
     }  
     
-    public String getVhclDescSQL(){
+    public String getSQLVhclDesc(){
         return    "   SELECT "                                                        
                 + "   a.sVhclIDxx " //1                                               
                 + " , a.sDescript " //2                                               
@@ -514,7 +513,35 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                 + " LEFT JOIN vehicle_type e ON a.sTypeIDxx = e.sTypeIDxx  "    ;
     
     }
-
+    
+    public String getSQLClientMaster(){
+        return   "  SELECT "                                                                                      
+                + "  a.sClientID "  //1                                                                                 
+                + ", a.sLastName "  //2                                                                                 
+                + ", a.sFrstName "  //3                                                                                 
+                + ", a.sMiddName "  //4                                                                                 
+                + ", a.sMaidenNm "  //5                                                                                 
+                + ", a.sSuffixNm "  //6                                                                               
+                + ", a.sCompnyNm "  //1                                                                               
+                + ", a.cClientTp "  //19                                                                                
+                + ", a.cRecdStat "  //20        
+                + ",  IFNULL(CONCAT( IFNULL(CONCAT(g.sHouseNox,' ') , ''), "                                         
+                + "   IFNULL(CONCAT(g.sAddressx,' ') , ''), "                                         
+                + "   IFNULL(CONCAT(h.sBrgyName,' '), ''), "                                         
+                + "   IFNULL(CONCAT(i.sTownName, ', '),''), "                                         
+                + "   IFNULL(CONCAT(j.sProvName),'') )	, '') AS sAddressx "  //28                                  
+                + "FROM client_master a "                                         
+                + "LEFT JOIN Country b ON a.sCitizenx = b.sCntryCde "                                         
+                + "LEFT JOIN TownCity c ON a.sBirthPlc = c.sTownIDxx "                                         
+                + "LEFT JOIN Province d ON c.sProvIDxx = d.sProvIDxx "                                         
+                + "LEFT JOIN client_master e ON e.sClientID = a.sSpouseID "                                         
+                + "LEFT JOIN client_address f ON f.sClientID = a.sClientID AND f.cPrimaryx = '1' "                      
+                + "LEFT JOIN addresses g ON g.sAddrssID = f.sAddrssID "                                         
+                + "LEFT JOIN barangay h ON h.sBrgyIDxx = g.sBrgyIDxx "                                         
+                + "LEFT JOIN towncity i ON i.sTownIDxx = g.sTownIDxx "                                         
+                + "LEFT JOIN province j ON j.sProvIDxx = i.sProvIDxx "  ;  
+    }
+    
     /**
      * Description: Sets the ID of this record.
      *
@@ -810,7 +837,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @param fdValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setEntryDte(java.util.Date fdValue){
+    public boolean setEntryDte(Date fdValue){
         setValue("dEntryDte", fdValue);
         return true;
     }
@@ -845,7 +872,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @param fdValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setModifiedDte(java.util.Date fdValue){
+    public boolean setModifiedDte(Date fdValue){
         setValue("dModified", fdValue);
         return true;
     }
@@ -880,7 +907,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @param fdValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setRegisterDte(java.util.Date fdValue){
+    public boolean setRegisterDte(Date fdValue){
         setValue("dRegister", fdValue);
         return true;
     }
@@ -888,8 +915,13 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     /**
      * @return The date and time the record was modified.
      */
-    public java.util.Date getRegisterDte() {
-        return (java.util.Date) getValue("dRegister");
+    public Date getRegisterDte() {
+        Date date = null;
+        if(!getValue("dRegister").toString().isEmpty()){
+            date = CommonUtils.toDate(getValue("dRegister").toString());
+        }
+        
+        return date;
     }
     
     /**
