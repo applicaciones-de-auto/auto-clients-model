@@ -238,7 +238,7 @@ public class Model_Addresses implements GEntity{
                     poJSON.put("message", "No record to save.");
                 }
             } else {
-                Model_Client_Address loOldEntity = new Model_Client_Address(poGRider);
+                Model_Addresses loOldEntity = new Model_Addresses(poGRider);
                 
                 setModifiedDte(poGRider.getServerDate());
                 setModifiedBy(poGRider.getUserID());

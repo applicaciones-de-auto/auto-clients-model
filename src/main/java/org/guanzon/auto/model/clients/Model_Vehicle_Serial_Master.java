@@ -6,16 +6,16 @@
 package org.guanzon.auto.model.clients;
 
 import java.lang.reflect.Method;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Date;
 import javax.sql.rowset.CachedRowSet;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GEntity;
 import org.json.simple.JSONObject;
 
@@ -26,7 +26,8 @@ import org.json.simple.JSONObject;
 public class Model_Vehicle_Serial_Master implements GEntity {
 
     final String XML = "Model_Vehicle_Serial_Master.xml";
-
+    private final String psDefaultDate = "1900-01-01";
+    
     GRider poGRider;                //application driver
     CachedRowSet poEntity;          //rowset
     JSONObject poJSON;              //json container
@@ -57,6 +58,8 @@ public class Model_Vehicle_Serial_Master implements GEntity {
 
             MiscUtil.initRowSet(poEntity);
             //poEntity.updateString("cRecdStat", RecordStatus.ACTIVE);
+            poEntity.updateInt("nYearModl", 0);
+            poEntity.updateObject("dRegister", SQLUtil.toDate(psDefaultDate, SQLUtil.FORMAT_SHORT_DATE));
 
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
@@ -220,7 +223,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
         pnEditMode = EditMode.ADDNEW;
 
         //replace with the primary key column info
-        setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()));
+        setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()+"VS"));
 
         poJSON = new JSONObject();
         poJSON.put("result", "success");
@@ -230,17 +233,17 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     /**
      * Opens a record.
      *
-     * @param fsCondition - filter values
+     * @param fsValue - filter values
      * @return result as success/failed
      */
     @Override
-    public JSONObject openRecord(String fsCondition) {
+    public JSONObject openRecord(String fsValue) {
         poJSON = new JSONObject();
 
-        String lsSQL = MiscUtil.makeSelect(this);
+        String lsSQL = getSQL(); // MiscUtil.makeSelect(this);
 
         //replace the condition based on the primary key column of the record
-        lsSQL = MiscUtil.addCondition(lsSQL, " sSerialID = " + SQLUtil.toSQL(fsCondition));
+        lsSQL = MiscUtil.addCondition(lsSQL, " a.sSerialID = " + SQLUtil.toSQL(fsValue));
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -273,15 +276,27 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      */
     @Override
     public JSONObject saveRecord() {
+        String lsExclude = "sPlateNox»dRegister»sPlaceReg»sMakeIDxx»sMakeDesc»sModelIDx»sModelDsc»sTypeIDxx»sTypeDesc»sColorIDx»sColorDsc»sTransMsn»nYearModl»sDescript"
+                            + "»sOwnerNmx»sCOwnerNm»sOwnerAdd»sCOwnerAd»sVhclStat»sUdrNoxxx»sUdrDatex»sBuyerNmx"; 
+        
         poJSON = new JSONObject();
 
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             String lsSQL;
+            // Assuming poGRider.getServerDate() returns a Timestamp
+//            Timestamp ltimestamp = poGRider.getServerDate();
+            // Convert Timestamp to Date
+            //Date date = new Date(ltimestamp.getTime());
+            
             if (pnEditMode == EditMode.ADDNEW) {
                 //replace with the primary key column info
-                setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()));
-
-                lsSQL = makeSQL();
+                setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()+"VS"));
+                setEntryBy(poGRider.getUserID());
+                setEntryDte(poGRider.getServerDate()); 
+                setModified(poGRider.getUserID());
+                setModifiedDte(poGRider.getServerDate());
+                
+                lsSQL = MiscUtil.makeSQL(this, lsExclude);
 
                 if (!lsSQL.isEmpty()) {
                     if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -302,8 +317,10 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                 JSONObject loJSON = loOldEntity.openRecord(this.getSerialID());
 
                 if ("success".equals((String) loJSON.get("result"))) {
+                    setModified(poGRider.getUserID());
+                    setModifiedDte(poGRider.getServerDate());
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSerialID = " + SQLUtil.toSQL(this.getSerialID()));
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSerialID = " + SQLUtil.toSQL(this.getSerialID()),lsExclude);
 
                     if (!lsSQL.isEmpty()) {
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -422,8 +439,8 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                         + ", c.sTransMsn " //32                                                                                          
                         + ", c.nYearModl " //33                                                                                          
                         + ", c.sDescript " //34                                                                                                                                                                                   
-                        + ", h.sCompnyNm " //35                                                                                          
-                        + ", i.sCompnyNm " //36                                                                                          
+                        + ", h.sCompnyNm AS sOwnerNmx" //35                                                                                          
+                        + ", i.sCompnyNm AS sCOwnerNm" //36                                                                                          
                         + ", IFNULL(CONCAT(IFNULL(CONCAT(jj.sHouseNox,' ') , ''), IFNULL(CONCAT(jj.sAddressx,' ') , ''), "              
                         + "	IFNULL(CONCAT(l.sBrgyName,' '), ''), "              
                         + "	IFNULL(CONCAT(k.sTownName, ', '),''), "              
@@ -431,7 +448,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                         + ", IFNULL(CONCAT(IFNULL(CONCAT(nn.sHouseNox,' ') , ''), IFNULL(CONCAT(nn.sAddressx,' ') , ''), "              
                         + "	IFNULL(CONCAT(p.sBrgyName,' '), ''), "              
                         + "	IFNULL(CONCAT(o.sTownName, ', '),''), "              
-                        + "	IFNULL(CONCAT(q.sProvName),''))	, '') AS sCoOwnerA " //38                      
+                        + "	IFNULL(CONCAT(q.sProvName),''))	, '') AS sCOwnerAd " //38                      
                         + ",CASE "              
                         + "  WHEN a.cSoldStat = '0' THEN 'NON SALES CUSTOMER' "              
                         + "  WHEN a.cSoldStat = '1' THEN 'AVAILABLE FOR SALE' "              
@@ -439,9 +456,9 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                         + "  WHEN a.cSoldStat = '3' THEN 'SOLD' "              
                         + " ELSE '' "              
                         + " END AS sVhclStat " //39         
-                        + " , r.sReferNox " //40         
-                        + " , r.dTransact " //41         
-                        + " , s.sCompnyNm " //42         
+                        + " , r.sReferNox AS sUdrNoxxx" //40         
+                        + " , r.dTransact AS sUdrDatex" //41         
+                        + " , s.sCompnyNm AS sBuyerNmx " //42         
                         + "FROM vehicle_serial a "              
                         + "LEFT JOIN vehicle_serial_registration b ON a.sSerialID = b.sSerialID "              
                         + "LEFT JOIN vehicle_master c ON c.sVhclIDxx = a.sVhclIDxx "              
@@ -467,8 +484,64 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                         + "LEFT JOIN udr_master     r ON r.sSerialID = a.sSerialID AND r.sClientID = a.sClientID AND r.cTranStat = '1' "
                         + "LEFT JOIN client_master  s ON s.sClientID = r.sClientID ";
                 
-    }                                                                            
-
+    }  
+    
+    public String getSQLVhclDesc(){
+        return    "   SELECT "                                                        
+                + "   a.sVhclIDxx " //1                                               
+                + " , a.sDescript " //2                                               
+                + " , a.sMakeIDxx " //3                                               
+                + " , a.sModelIDx " //4                                               
+                + " , a.sColorIDx " //5                                               
+                + " , a.sTypeIDxx " //6                                               
+                + " , a.sTransMsn " //7                                               
+                + " , a.nYearModl " //8                                               
+                + " , a.cVhclSize " //9                                               
+                + " , a.cRecdStat " //10                                              
+                + " , a.sEntryByx " //11                                              
+                + " , a.dEntryDte " //12                                              
+                + " , a.sModified " //13                                              
+                + " , a.dModified " //14                                              
+                + " , c.sMakeDesc " //15                                              
+                + " , b.sModelDsc " //16                                              
+                + " , d.sColorDsc " //17                                              
+                + " , e.sTypeDesc " //18                                              
+                + " FROM vehicle_master a "                                           
+                + " LEFT JOIN vehicle_model b ON a.sModelIDx = b.sModelIDx "          
+                + " LEFT JOIN vehicle_make c ON a.sMakeIDxx = c.sMakeIDxx  "          
+                + " LEFT JOIN vehicle_color d ON a.sColorIDx = d.sColorIDx "          
+                + " LEFT JOIN vehicle_type e ON a.sTypeIDxx = e.sTypeIDxx  "    ;
+    
+    }
+    
+    public String getSQLClientMaster(){
+        return   "  SELECT "                                                                                      
+                + "  a.sClientID "  //1                                                                                 
+                + ", a.sLastName "  //2                                                                                 
+                + ", a.sFrstName "  //3                                                                                 
+                + ", a.sMiddName "  //4                                                                                 
+                + ", a.sMaidenNm "  //5                                                                                 
+                + ", a.sSuffixNm "  //6                                                                               
+                + ", a.sCompnyNm "  //1                                                                               
+                + ", a.cClientTp "  //19                                                                                
+                + ", a.cRecdStat "  //20        
+                + ",  IFNULL(CONCAT( IFNULL(CONCAT(g.sHouseNox,' ') , ''), "                                         
+                + "   IFNULL(CONCAT(g.sAddressx,' ') , ''), "                                         
+                + "   IFNULL(CONCAT(h.sBrgyName,' '), ''), "                                         
+                + "   IFNULL(CONCAT(i.sTownName, ', '),''), "                                         
+                + "   IFNULL(CONCAT(j.sProvName),'') )	, '') AS sAddressx "  //28                                  
+                + "FROM client_master a "                                         
+                + "LEFT JOIN Country b ON a.sCitizenx = b.sCntryCde "                                         
+                + "LEFT JOIN TownCity c ON a.sBirthPlc = c.sTownIDxx "                                         
+                + "LEFT JOIN Province d ON c.sProvIDxx = d.sProvIDxx "                                         
+                + "LEFT JOIN client_master e ON e.sClientID = a.sSpouseID "                                         
+                + "LEFT JOIN client_address f ON f.sClientID = a.sClientID AND f.cPrimaryx = '1' "                      
+                + "LEFT JOIN addresses g ON g.sAddrssID = f.sAddrssID "                                         
+                + "LEFT JOIN barangay h ON h.sBrgyIDxx = g.sBrgyIDxx "                                         
+                + "LEFT JOIN towncity i ON i.sTownIDxx = g.sTownIDxx "                                         
+                + "LEFT JOIN province j ON j.sProvIDxx = i.sProvIDxx "  ;  
+    }
+    
     /**
      * Description: Sets the ID of this record.
      *
@@ -724,39 +797,22 @@ public class Model_Vehicle_Serial_Master implements GEntity {
         return (String) getValue("cVhclNewx");
     }
     
-//    /**
-//     * Description: Sets the Value of this record.
-//     *
-//     * @param fsValue
-//     * @return result as success/failed
-//     */
-//    public JSONObject setRecdStat(String fsValue) {
-//        return setValue("cRecdStat", fsValue);
-//    }
-//
-//    /**
-//     * @return The Value of this record.
-//     */
-//    public String gsetRecdStat() {
-//        return (String) getValue("cRecdStat");
-//    }
-    
-//    /**
-//     * Sets record as active.
-//     *
-//     * @param fbValue
-//     * @return result as success/failed
-//     */
-//    public JSONObject setActive(boolean fbValue) {
-//        return setValue("cRecdStat", fbValue ? "1" : "0");
-//    }
-//
-//    /**
-//     * @return If record is active.
-//     */
-//    public boolean isActive() {
-//        return ((String) getValue("cRecdStat")).equals("1");
-//    }
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setRemarks(String fsValue) {
+        return setValue("sRemarksx", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getRemarks() {
+        return (String) getValue("sRemarksx");
+    }
     
     /**
      * Description: Sets the Value of this record.
@@ -776,13 +832,14 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     }
     
     /**
-     * Sets the date and time the record was modified.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setEntryDte(Date fdValue) {
-        return setValue("dEntryDte", fdValue);
+    public boolean setEntryDte(Date fdValue){
+        setValue("dEntryDte", fdValue);
+        return true;
     }
 
     /**
@@ -810,13 +867,14 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     }
     
     /**
-     * Sets the date and time the record was modified.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setModifiedDte(Date fdValue) {
-        return setValue("dModified", fdValue);
+    public boolean setModifiedDte(Date fdValue){
+        setValue("dModified", fdValue);
+        return true;
     }
 
     /**
@@ -844,20 +902,26 @@ public class Model_Vehicle_Serial_Master implements GEntity {
     }
     
     /**
-     * Sets the date and time the record was modified.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setRegisterDte(Date fdValue) {
-        return setValue("dRegister", fdValue);
+    public boolean setRegisterDte(Date fdValue){
+        setValue("dRegister", fdValue);
+        return true;
     }
 
     /**
      * @return The date and time the record was modified.
      */
     public Date getRegisterDte() {
-        return (Date) getValue("dRegister");
+        Date date = null;
+        if(!getValue("dRegister").toString().isEmpty()){
+            date = CommonUtils.toDate(getValue("dRegister").toString());
+        }
+        
+        return date;
     }
     
     /**
@@ -1044,7 +1108,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @return The Value of this record.
      */
     public Integer getYearModl() {
-        return (Integer) getValue("nYearModl");
+        return Integer.parseInt(String.valueOf(getValue("nYearModl")));
     }
     
     /**
@@ -1070,15 +1134,15 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @param fsValue
      * @return result as success/failed
      */
-    public JSONObject setRemarks(String fsValue) {
-        return setValue("sRemarksx", fsValue);
+    public JSONObject setOwnerNmx(String fsValue) {
+        return setValue("sOwnerNmx", fsValue);
     }
 
     /**
      * @return The Value of this record.
      */
-    public String getRemarks() {
-        return (String) getValue("sRemarksx");
+    public String getOwnerNmx() {
+        return (String) getValue("sOwnerNmx");
     }
     
     /**
@@ -1087,32 +1151,15 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @param fsValue
      * @return result as success/failed
      */
-    public JSONObject setOwnerNam(String fsValue) {
-        return setValue("sOwnerNam", fsValue);
+    public JSONObject setCOwnerNm(String fsValue) {
+        return setValue("sCOwnerNm", fsValue);
     }
 
     /**
      * @return The Value of this record.
      */
-    public String getOwnerNam() {
-        return (String) getValue("sOwnerNam");
-    }
-    
-    /**
-     * Description: Sets the Value of this record.
-     *
-     * @param fsValue
-     * @return result as success/failed
-     */
-    public JSONObject setCoOwnerN(String fsValue) {
-        return setValue("sCoOwnerN", fsValue);
-    }
-
-    /**
-     * @return The Value of this record.
-     */
-    public String getCoOwnerN() {
-        return (String) getValue("sCoOwnerN");
+    public String getCOwnerNm() {
+        return (String) getValue("sCOwnerNm");
     }
     
     /**
@@ -1138,15 +1185,15 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @param fsValue
      * @return result as success/failed
      */
-    public JSONObject setCoOwnerA(String fsValue) {
-        return setValue("sCoOwnerA", fsValue);
+    public JSONObject setCOwnerAd(String fsValue) {
+        return setValue("sCOwnerAd", fsValue);
     }
 
     /**
      * @return The Value of this record.
      */
-    public String getCoOwnerA() {
-        return (String) getValue("sCoOwnerA");
+    public String getCOwnerAd() {
+        return (String) getValue("sCOwnerAd");
     }
     
     /**
@@ -1207,13 +1254,13 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @return result as success/failed
      */
     public JSONObject setSoldTo(String fsValue) {
-        return setValue("sSoldToxx", fsValue);
+        return setValue("sBuyerNmx", fsValue);
     }
 
     /**
      * @return The Value of this record.
      */
     public String getSoldTo() {
-        return (String) getValue("sSoldToxx");
+        return (String) getValue("sBuyerNmx");
     }
 }

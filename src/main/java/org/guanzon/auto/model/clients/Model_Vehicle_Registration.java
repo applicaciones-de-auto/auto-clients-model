@@ -6,16 +6,16 @@
 package org.guanzon.auto.model.clients;
 
 import java.lang.reflect.Method;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import javax.sql.rowset.CachedRowSet;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
-import org.guanzon.appdriver.constant.RecordStatus;
 import org.guanzon.appdriver.iface.GEntity;
 import org.json.simple.JSONObject;
 
@@ -26,6 +26,7 @@ import org.json.simple.JSONObject;
 public class Model_Vehicle_Registration implements GEntity {
 
     final String XML = "Model_Vehicle_Registration.xml";
+    private final String psDefaultDate = "1900-01-01";
 
     GRider poGRider;                //application driver
     CachedRowSet poEntity;          //rowset
@@ -57,6 +58,7 @@ public class Model_Vehicle_Registration implements GEntity {
 
             MiscUtil.initRowSet(poEntity);
 //            poEntity.updateString("cRecdStat", RecordStatus.ACTIVE);
+            poEntity.updateObject("dRegister", SQLUtil.toDate(psDefaultDate, SQLUtil.FORMAT_SHORT_DATE));
 
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
@@ -219,9 +221,6 @@ public class Model_Vehicle_Registration implements GEntity {
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
 
-        //replace with the primary key column info
-        //setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()));
-
         poJSON = new JSONObject();
         poJSON.put("result", "success");
         return poJSON;
@@ -279,9 +278,12 @@ public class Model_Vehicle_Registration implements GEntity {
             String lsSQL;
             if (pnEditMode == EditMode.ADDNEW) {
                 //replace with the primary key column info
-                //setSerialID(MiscUtil.getNextCode(getTable(), "sSerialID", true, poGRider.getConnection(), poGRider.getBranchCode()));
-
-                lsSQL = makeSQL();
+                setModified(poGRider.getUserID());
+                setModifiedDte(poGRider.getServerDate());
+                setEntryBy( poGRider.getUserID());
+                setEntryDte(poGRider.getServerDate());
+                
+                lsSQL = MiscUtil.makeSQL(this);
 
                 if (!lsSQL.isEmpty()) {
                     if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -302,6 +304,9 @@ public class Model_Vehicle_Registration implements GEntity {
                 JSONObject loJSON = loOldEntity.openRecord(this.getSerialID());
 
                 if ("success".equals((String) loJSON.get("result"))) {
+                    setModified(poGRider.getUserID());
+                    setModifiedDte(poGRider.getServerDate());
+                    
                     //replace the condition based on the primary key column of the record
                     lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSerialID = " + SQLUtil.toSQL(this.getSerialID()));
 
@@ -387,23 +392,22 @@ public class Model_Vehicle_Registration implements GEntity {
     }
     
     public String getSQL(){
-        return    "  SELECT "                        
-                + "  a.sSerialID  " //1   
-                + ", a.sCSRValNo  " //2   
-                + ", a.sPNPClrNo  " //3   
-                + ", a.sCRNoxxxx  " //4   
-                + ", a.sCRENoxxx  " //5   
-                + ", a.sRegORNox  " //6   
-                + ", a.sFileNoxx  " //7   
-                + ", a.sPlateNox  " //8   
-                + ", a.dRegister  " //9   
-                + ", a.sPlaceReg  " //10  
-                + ", a.sEntryByx  " //11  
-                + ", a.dEntryDte  " //12  
-                + ", a.sModified  " //13  
-                + ", a.dModified  " //14                
-                + "FROM vehicle_serial_registration a "                    
-                + "LEFT JOIN vehicle_serial b ON b.sSerialID = a.sSerialID ";  
+        return    "  SELECT "                                         
+                + "  sSerialID  " //1                  
+                + ", sCSRValNo  " //2                  
+                + ", sPNPClrNo  " //3                  
+                + ", sCRNoxxxx  " //4                  
+                + ", sCRENoxxx  " //5                  
+                + ", sRegORNox  " //6                  
+                + ", sFileNoxx  " //7                  
+                + ", sPlateNox  " //8                  
+                + ", dRegister  " //9                  
+                + ", sPlaceReg  " //10                 
+                + ", sEntryByx  " //11                 
+                + ", dEntryDte  " //12                 
+                + ", sModified  " //13                 
+                + ", dModified  " //14                 
+                + "FROM vehicle_serial_registration " ;
     }                                                                            
 
     /**
@@ -543,20 +547,25 @@ public class Model_Vehicle_Registration implements GEntity {
     }
     
     /**
-     * Description: Sets the Value of this record.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setRegisterDte(Date fdValue) {
-        return setValue("dRegister", fdValue);
+    public boolean setRegisterDte(Date fdValue){
+        setValue("dRegister", fdValue);
+        return true;
     }
 
     /**
      * @return The Value of this record.
      */
     public Date getRegisterDte() {
-        return (Date) getValue("dRegister");
+        Date date = null;
+        if(!getValue("dRegister").toString().isEmpty()){
+            date = CommonUtils.toDate(getValue("dRegister").toString());
+        }
+        return date;
     }
     
     /**
@@ -628,13 +637,14 @@ public class Model_Vehicle_Registration implements GEntity {
     }
     
     /**
-     * Sets the date and time the record was modified.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setEntryDte(Date fdValue) {
-        return setValue("dEntryDte", fdValue);
+    public boolean setEntryDte(java.util.Date fdValue){
+        setValue("dEntryDte", fdValue);
+        return true;
     }
 
     /**
@@ -662,13 +672,14 @@ public class Model_Vehicle_Registration implements GEntity {
     }
     
     /**
-     * Sets the date and time the record was modified.
-     *
-     * @param fdValue
-     * @return result as success/failed
+     * Sets the value of this record.
+     * 
+     * @param fdValue 
+     * @return  True if the record assignment is successful.
      */
-    public JSONObject setModifiedDte(Date fdValue) {
-        return setValue("dModified", fdValue);
+    public boolean setModifiedDte(java.util.Date fdValue){
+        setValue("dModified", fdValue);
+        return true;
     }
 
     /**

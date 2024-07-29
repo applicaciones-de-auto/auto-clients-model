@@ -9,10 +9,7 @@ import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
 import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
@@ -636,7 +633,7 @@ public class Model_Client_Master implements GEntity{
     /**
      * Sets the value of this record.
      * 
-     * @param fsValue 
+     * @param fdValue 
      * @return  True if the record assignment is successful.
      */
     public boolean setBirthDte(Date fdValue){
@@ -840,7 +837,7 @@ public class Model_Client_Master implements GEntity{
     /**
      * Sets the value of this record.
      * 
-     * @param fsValue 
+     * @param fdValue 
      * @return  True if the record assignment is successful.
      */
     public boolean setEntryDte(Date fdValue){
@@ -876,7 +873,7 @@ public class Model_Client_Master implements GEntity{
     /**
      * Sets the value of this record.
      * 
-     * @param fsValue 
+     * @param fdValue 
      * @return  True if the record assignment is successful.
      */
     public boolean setModifiedDte(Date fdValue){
