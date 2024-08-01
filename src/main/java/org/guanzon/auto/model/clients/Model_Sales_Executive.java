@@ -10,7 +10,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetFactory;
+import javax.sql.rowset.RowSetProvider;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
@@ -31,6 +35,8 @@ public class Model_Sales_Executive implements GEntity {
     CachedRowSet poEntity;          //rowset
     JSONObject poJSON;              //json container
     int pnEditMode;                 //edit mode
+    
+    private CachedRowSet poTransactions;
 
     /**
      * Entity constructor
@@ -124,7 +130,7 @@ public class Model_Sales_Executive implements GEntity {
 
     @Override
     public String getTable() {
-        return "brand";
+        return "sales_executive";
     }
 
     /**
@@ -219,9 +225,6 @@ public class Model_Sales_Executive implements GEntity {
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
 
-        //replace with the primary key column info
-        setBrandCde(MiscUtil.getNextCode(getTable(), "sBrandCde", true, poGRider.getConnection(), poGRider.getBranchCode()));
-
         poJSON = new JSONObject();
         poJSON.put("result", "success");
         return poJSON;
@@ -230,17 +233,17 @@ public class Model_Sales_Executive implements GEntity {
     /**
      * Opens a record.
      *
-     * @param fsCondition - filter values
+     * @param fsValue - filter values
      * @return result as success/failed
      */
     @Override
-    public JSONObject openRecord(String fsCondition) {
+    public JSONObject openRecord(String fsValue) {
         poJSON = new JSONObject();
 
-        String lsSQL = MiscUtil.makeSelect(this);
+        String lsSQL = getSQL();
 
         //replace the condition based on the primary key column of the record
-        lsSQL = MiscUtil.addCondition(lsSQL, " sBrandCde = " + SQLUtil.toSQL(fsCondition));
+        lsSQL = MiscUtil.addCondition(lsSQL, " a.sClientID = " + SQLUtil.toSQL(fsValue));
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -273,15 +276,15 @@ public class Model_Sales_Executive implements GEntity {
      */
     @Override
     public JSONObject saveRecord() {
+        String lsExclude = "sLastName»sFrstName»sMiddName»sCompnyNm»sMobileNo»sEmailAdd»sAddressx»cClientTp";
+        
         poJSON = new JSONObject();
 
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             String lsSQL;
             if (pnEditMode == EditMode.ADDNEW) {
-                //replace with the primary key column info
-                setBrandCde(MiscUtil.getNextCode(getTable(), "sBrandCde", true, poGRider.getConnection(), poGRider.getBranchCode()));
-
-                lsSQL = makeSQL();
+                
+                lsSQL = MiscUtil.makeSQL(this, lsExclude);
 
                 if (!lsSQL.isEmpty()) {
                     if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -299,11 +302,11 @@ public class Model_Sales_Executive implements GEntity {
                 Model_Sales_Executive loOldEntity = new Model_Sales_Executive(poGRider);
 
                 //replace with the primary key column info
-                JSONObject loJSON = loOldEntity.openRecord(this.getBrandCde());
+                JSONObject loJSON = loOldEntity.openRecord(this.getClientID());
 
                 if ("success".equals((String) loJSON.get("result"))) {
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sBrandCde = " + SQLUtil.toSQL(this.getBrandCde()));
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sClientID = " + SQLUtil.toSQL(this.getClientID()),lsExclude);
 
                     if (!lsSQL.isEmpty()) {
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -386,14 +389,26 @@ public class Model_Sales_Executive implements GEntity {
         return MiscUtil.makeSelect(this);
     }
     
-    private String getSQL(){
-        return "SELECT" + 
-                    " sBrandCde" + //1
-                    ", IFNULL(sDescript,'') sDescript" + //2
-                    ", cRecdStat" + //3
-                    ", sModified" + //4
-                    ", dModified" + //5
-                " FROM brand ";
+    public String getSQL(){
+        return    " SELECT "                                                                                                                                                                                                      
+                + "    a.sClientID "                                                                                                                                                                                              
+                + "  , a.cRecdStat "                                                                                                                                                                                              
+                + "  , b.sLastName "                                                                                                                                                                                              
+                + "  , b.sFrstName "                                                                                                                                                                                              
+                + "  , b.sMiddName "                                                                                                                                                                                              
+                + "  , b.sCompnyNm "      
+                + "  , b.cClientTp "
+                + "  , IFNULL(b.sMobileNo,IFNULL(c.sMobileNo,'') )    sMobileNo "                                                                                                                                                 
+                + "  , IFNULL(b.sEmailAdd,IFNULL(e.sEmailAdd,'') )    sEmailAdd "                                                                                                                                                 
+                + "  , IFNULL(b.sAddressx,IFNULL(CONCAT( IFNULL(CONCAT(f.sAddressx,' '), ''), IFNULL(CONCAT(h.sBrgyName,' '), ''), IFNULL(CONCAT(g.sTownName, ', '),''), IFNULL(CONCAT(i.sProvName),'') ), '')) AS sAddressx   "  
+                + " FROM sales_executive a  "                                                                                                                                                                                     
+                + " LEFT JOIN GGC_ISysDBF.Client_Master b ON b.sClientID = a.sClientID "                                                                                                                                          
+                + " LEFT JOIN GGC_ISysDBF.Client_Mobile c ON c.sClientID = a.sClientID AND c.nPriority = 1 AND c.cRecdStat = 1 "                                                                                                  
+                + " LEFT JOIN GGC_ISysDBF.Client_eMail_Address e ON e.sClientID = a.sClientID AND e.nPriority = 1 "                                                                                                               
+                + " LEFT JOIN GGC_ISysDBF.Client_Address f ON f.sClientID = a.sClientID AND f.nPriority = 1 "                                                                                                                     
+                + " LEFT JOIN GGC_ISysDBF.TownCity g ON g.sTownIDxx = f.sTownIDxx "                                                                                                                                               
+                + " LEFT JOIN GGC_ISysDBF.barangay h ON h.sBrgyIDxx = f.sBrgyIDxx AND h.sTownIDxx = f.sTownIDxx "                                                                                                                 
+                + " LEFT JOIN GGC_ISysDBF.Province i ON i.sProvIDxx = g.sProvIDxx " ;
     }
     
     /**
@@ -402,32 +417,15 @@ public class Model_Sales_Executive implements GEntity {
      * @param fsValue
      * @return result as success/failed
      */
-    public JSONObject setBrandCde(String fsValue) {
-        return setValue("sBrandCde", fsValue);
+    public JSONObject setClientID(String fsValue) {
+        return setValue("sClientID", fsValue);
     }
 
     /**
      * @return The ID of this record.
      */
-    public String getBrandCde() {
-        return (String) getValue("sBrandCde");
-    }
-    
-    /**
-     * Description: Sets the ID of this record.
-     *
-     * @param fsValue
-     * @return result as success/failed
-     */
-    public JSONObject setDescript(String fsValue) {
-        return setValue("sDescript", fsValue);
-    }
-
-    /**
-     * @return The ID of this record.
-     */
-    public String getDescript() {
-        return (String) getValue("sDescript");
+    public String getClientID() {
+        return (String) getValue("sClientID");
     }
     
     /**
@@ -443,7 +441,7 @@ public class Model_Sales_Executive implements GEntity {
     /**
      * @return The Value of this record.
      */
-    public String gsetRecdStat() {
+    public String getRecdStat() {
         return (String) getValue("cRecdStat");
     }
     
@@ -470,33 +468,134 @@ public class Model_Sales_Executive implements GEntity {
      * @param fsValue
      * @return result as success/failed
      */
-    public JSONObject setModified(String fsValue) {
-        return setValue("sModified", fsValue);
+    public JSONObject setLastName(String fsValue) {
+        return setValue("sLastName", fsValue);
     }
 
     /**
      * @return The Value of this record.
      */
-    public String getModified() {
-        return (String) getValue("sModified");
+    public String getLastName() {
+        return (String) getValue("sLastName");
     }
     
     /**
-     * Sets the date and time the record was modified.
+     * Description: Sets the Value of this record.
      *
-     * @param fdValue
+     * @param fsValue
      * @return result as success/failed
      */
-    public JSONObject setModifiedDte(Date fdValue) {
-        return setValue("dModified", fdValue);
+    public JSONObject setFrstName(String fsValue) {
+        return setValue("sFrstName", fsValue);
     }
 
     /**
-     * @return The date and time the record was modified.
+     * @return The Value of this record.
      */
-    public Date getModifiedDte() {
-        return (Date) getValue("dModified");
+    public String getFrstName() {
+        return (String) getValue("sFrstName");
     }
     
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setMiddName(String fsValue) {
+        return setValue("sMiddName", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getMiddName() {
+        return (String) getValue("sMiddName");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setCompnyNm(String fsValue) {
+        return setValue("sCompnyNm", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getCompnyNm() {
+        return (String) getValue("sCompnyNm");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setMobileNo(String fsValue) {
+        return setValue("sMobileNo", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getMobileNo() {
+        return (String) getValue("sMobileNo");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setEmailAdd(String fsValue) {
+        return setValue("sEmailAdd", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getEmailAdd() {
+        return (String) getValue("sEmailAdd");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setAddress(String fsValue) {
+        return setValue("sAddressx", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getAddress() {
+        return (String) getValue("sAddressx");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setClientTp(String fsValue) {
+        return setValue("cClientTp", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getClientTp() {
+        return (String) getValue("cClientTp");
+    }
     
 }

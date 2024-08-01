@@ -25,11 +25,11 @@ import org.json.simple.JSONObject;
  */
 public class Model_Sales_Agent implements GEntity {
     final String XML = "Model_Sales_Agent.xml";
+
     GRider poGRider;                //application driver
     CachedRowSet poEntity;          //rowset
     JSONObject poJSON;              //json container
     int pnEditMode;                 //edit mode
-
     /**
      * Entity constructor
      *
@@ -217,9 +217,6 @@ public class Model_Sales_Agent implements GEntity {
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
 
-        //replace with the primary key column info
-        setBrandCde(MiscUtil.getNextCode(getTable(), "sBrandCde", true, poGRider.getConnection(), poGRider.getBranchCode()));
-
         poJSON = new JSONObject();
         poJSON.put("result", "success");
         return poJSON;
@@ -228,17 +225,17 @@ public class Model_Sales_Agent implements GEntity {
     /**
      * Opens a record.
      *
-     * @param fsCondition - filter values
+     * @param fsValue - filter values
      * @return result as success/failed
      */
     @Override
-    public JSONObject openRecord(String fsCondition) {
+    public JSONObject openRecord(String fsValue) {
         poJSON = new JSONObject();
 
         String lsSQL = MiscUtil.makeSelect(this);
 
         //replace the condition based on the primary key column of the record
-        lsSQL = MiscUtil.addCondition(lsSQL, " sBrandCde = " + SQLUtil.toSQL(fsCondition));
+        lsSQL = MiscUtil.addCondition(lsSQL, " sClientID = " + SQLUtil.toSQL(fsValue));
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -277,9 +274,9 @@ public class Model_Sales_Agent implements GEntity {
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
             String lsSQL;
             if (pnEditMode == EditMode.ADDNEW) {
-                //replace with the primary key column info
-                setBrandCde(MiscUtil.getNextCode(getTable(), "sBrandCde", true, poGRider.getConnection(), poGRider.getBranchCode()));
-
+                setModified(poGRider.getUserID());
+                setModifiedDte(poGRider.getServerDate());
+                
                 lsSQL = MiscUtil.makeSQL(this, lsExclude);
                 if (!lsSQL.isEmpty()) {
                     if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -297,11 +294,13 @@ public class Model_Sales_Agent implements GEntity {
                 Model_Sales_Agent loOldEntity = new Model_Sales_Agent(poGRider);
 
                 //replace with the primary key column info
-                JSONObject loJSON = loOldEntity.openRecord(this.getBrandCde());
+                JSONObject loJSON = loOldEntity.openRecord(this.getClientID());
 
                 if ("success".equals((String) loJSON.get("result"))) {
+                setModified(poGRider.getUserID());
+                setModifiedDte(poGRider.getServerDate());
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sBrandCde = " + SQLUtil.toSQL(this.getBrandCde()));
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sClientID = " + SQLUtil.toSQL(this.getClientID()),lsExclude);
 
                     if (!lsSQL.isEmpty()) {
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
@@ -384,36 +383,36 @@ public class Model_Sales_Agent implements GEntity {
         return MiscUtil.makeSelect(this);
     }
     
-    private String getSQL(){
-        return    " SELECT "                                                                                                                
-                + "   IFNULL(a.sClientID,'') sClientID " //1                                                                              
-                + " , IFNULL(a.sAgentTyp,'') sAgentTyp " //2                                                                              
-                + " , IFNULL(a.cRecdStat,'') cRecdStat " //3                                                                              
-                + " , IFNULL(a.sModified,'') sModified " //4                                                                              
-                + " , a.dModified "                      //5                                                                              
-                + " , IFNULL(b.cClientTp,'') cClientTp " //6                                                                              
-                + " , IFNULL(b.sLastName,'') sLastName " //7                                                                              
-                + " , IFNULL(b.sFrstName,'') sFrstName " //8                                                                              
-                + " , IFNULL(b.sMiddName,'') sMiddName " //9                                                                              
-                + " , IFNULL(b.sCompnyNm,'') sCompnyNm " //10                                                                             
-                + " , IFNULL(c.sMobileNo,'') sMobileNo " //11                                                                             
-                + " , IFNULL(d.sAccountx,'') sAccountx " //12                                                                             
-                + " , IFNULL(e.sEmailAdd,'') sEmailAdd " //13                                                                             
-                + " , IFNULL(CONCAT( IFNULL(CONCAT(ff.sHouseNox,' ') , ''), "                                                              
-                + " IFNULL(CONCAT(ff.sAddressx,' ') , ''), "                                                                              
-                + " IFNULL(CONCAT(h.sBrgyName,' '), ''),  "                                                                               
-                + " IFNULL(CONCAT(g.sTownName, ', '),''), "                                                                               
-                + " IFNULL(CONCAT(i.sProvName),'') )	, '') AS sAddressx "  //14                                                          
-                + " FROM sales_agent a  "                                                                                                 
-                + " LEFT JOIN client_master b ON b.sClientID = a.sClientID  "                                                             
-                + " LEFT JOIN client_mobile c ON c.sClientID = a.sClientID AND c.cPrimaryx = '1' AND c.cRecdStat = '1'            "       
-                + " LEFT JOIN client_social_media d ON  d.sClientID = a.sClientID AND d.cRecdStat = '1'                           "       
-                + " LEFT JOIN client_email_address e ON  e.sClientID = a.sClientID AND e.cPrimaryx = '1' AND e.cRecdStat = '1'    "       
-                + " LEFT JOIN client_address f ON f.sClientID = a.sClientID AND f.cPrimaryx = '1'                                 "       
-                + " LEFT JOIN addresses ff ON ff.sClientID = a.sClientID "                                                                
-                + " LEFT JOIN TownCity g ON g.sTownIDxx = ff.sTownIDxx    "                                                               
-                + " LEFT JOIN barangay h ON h.sBrgyIDxx = ff.sBrgyIDxx AND h.sTownIDxx = ff.sTownIDxx "                                   
-                + " LEFT JOIN Province i ON i.sProvIDxx = g.sProvIDxx ";                                                                  
+    public String getSQL(){
+        return    "   SELECT "                                                                                               
+                + "   a.sClientID "                                                                                          
+                + " , a.sAgentTyp "                                                                                          
+                + " , a.cRecdStat "                                                                                          
+                + " , a.sModified "                                                                                          
+                + " , a.dModified "                                                                                          
+                + " , b.cClientTp "                                                                                          
+                + " , b.sLastName "                                                                                          
+                + " , b.sFrstName "                                                                                          
+                + " , b.sMiddName "                                                                                          
+                + " , b.sCompnyNm "                                                                                          
+                + " , c.sMobileNo "                                                                                          
+                + " , d.sAccountx "                                                                                          
+                + " , e.sEmailAdd "                                                                                          
+                + " , IFNULL(CONCAT( IFNULL(CONCAT(g.sHouseNox,' ') , ''), "                                                 
+                + " IFNULL(CONCAT(g.sAddressx,' ') , ''),  "                                                                 
+                + " IFNULL(CONCAT(i.sBrgyName,' '), ''),   "                                                                 
+                + " IFNULL(CONCAT(h.sTownName, ', '),''),  "                                                                 
+                + " IFNULL(CONCAT(j.sProvName),'') )	, '') AS sAddressx  "                                                  
+                + " FROM sales_agent a   "                                                                                   
+                + " LEFT JOIN client_master b ON b.sClientID = a.sClientID "                                                 
+                + " LEFT JOIN client_mobile c ON c.sClientID = a.sClientID AND c.cPrimaryx = 1 AND c.cRecdStat = 1  "        
+                + " LEFT JOIN client_social_media d ON  d.sClientID = a.sClientID AND d.cRecdStat = 1   "                    
+                + " LEFT JOIN client_email_address e ON  e.sClientID = a.sClientID AND e.cPrimaryx = 1 AND e.cRecdStat = 1 " 
+                + " LEFT JOIN client_address f ON f.sClientID = a.sClientID AND f.cPrimaryx = 1 "                            
+                + " LEFT JOIN addresses g ON g.sAddrssID = f.sAddrssID "                                                     
+                + " LEFT JOIN TownCity h ON h.sTownIDxx = g.sTownIDxx  "                                                     
+                + " LEFT JOIN barangay i ON i.sBrgyIDxx = g.sBrgyIDxx AND i.sTownIDxx = g.sTownIDxx  "                       
+                + " LEFT JOIN Province j ON j.sProvIDxx = h.sProvIDxx  " ;                                                                  
     }
     
     /**
@@ -422,15 +421,15 @@ public class Model_Sales_Agent implements GEntity {
      * @param fsValue
      * @return result as success/failed
      */
-    public JSONObject setBrandCde(String fsValue) {
-        return setValue("sBrandCde", fsValue);
+    public JSONObject setClientID(String fsValue) {
+        return setValue("sClientID", fsValue);
     }
 
     /**
      * @return The ID of this record.
      */
-    public String getBrandCde() {
-        return (String) getValue("sBrandCde");
+    public String getClientID() {
+        return (String) getValue("sClientID");
     }
     
     /**
@@ -439,15 +438,15 @@ public class Model_Sales_Agent implements GEntity {
      * @param fsValue
      * @return result as success/failed
      */
-    public JSONObject setDescript(String fsValue) {
-        return setValue("sDescript", fsValue);
+    public JSONObject setAgentTyp(String fsValue) {
+        return setValue("sAgentTyp", fsValue);
     }
 
     /**
      * @return The ID of this record.
      */
-    public String getDescript() {
-        return (String) getValue("sDescript");
+    public String getAgentTyp() {
+        return (String) getValue("sAgentTyp");
     }
     
     /**
@@ -517,6 +516,152 @@ public class Model_Sales_Agent implements GEntity {
     public Date getModifiedDte() {
         return (Date) getValue("dModified");
     }
+    
+    /**
+     * Sets the value of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public boolean setLastName(String fsValue){
+        setValue("sLastName", fsValue);
+        return true;
+    }
+    
+    /** 
+     * @return The value of this record. 
+     */
+    public String getLastName(){
+        return (String) getValue("sLastName");
+    }
+    
+    /**
+     * Sets the value of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public boolean setFirstName(String fsValue){
+        setValue("sFrstName", fsValue);
+        return true;
+    }
+    
+    /** 
+     * @return The value of this record. 
+     */
+    public String getFirstName(){
+        return (String) getValue("sFrstName");
+    }
+    
+    /**
+     * Sets the value of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public boolean setMiddleName(String fsValue){
+        setValue("sMiddName", fsValue);
+        return true;
+    }
+    
+    /** 
+     * @return The value of this record. 
+     */
+    public String getMiddleName(){
+        return (String) getValue("sMiddName");
+    }
+    
+    /**
+     * Sets the value of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public boolean setMaidenName(String fsValue){
+        setValue("sMaidenNm", fsValue);
+        return true;
+    }
+    
+    /** 
+     * @return The value of this record. 
+     */
+    public String getMaidenName(){
+        return (String) getValue("sMaidenNm");
+    }
+    
+    /**
+     * Sets the value of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public boolean setMobileNo(String fsValue){
+        setValue("sMobileNo", fsValue);
+        return true;
+    }
+    
+    /** 
+     * @return The value of this record. 
+     */
+    public String getMobileNo(){
+        return (String) getValue("sMobileNo");
+    }
+    
+    /**
+     * Sets the value of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public boolean setAccount(String fsValue){
+        setValue("sAccountx", fsValue);
+        return true;
+    }
+    
+    /** 
+     * @return The value of this record. 
+     */
+    public String getAccount(){
+        return (String) getValue("sAccountx");
+    }
+    
+    /**
+     * Sets the value of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public boolean setEmailAdd(String fsValue){
+        setValue("sEmailAdd", fsValue);
+        return true;
+    }
+    
+    /** 
+     * @return The value of this record. 
+     */
+    public String getEmailAdd(){
+        return (String) getValue("sEmailAdd");
+    }
+    
+    /**
+     * Sets the value of this record.
+     * 
+     * @param fsValue 
+     * @return  True if the record assignment is successful.
+     */
+    public boolean setAddress(String fsValue){
+        setValue("sAddressx", fsValue);
+        return true;
+    }
+    
+    /** 
+     * @return The value of this record. 
+     */
+    public String getAddress(){
+        return (String) getValue("sAddressx");
+    }
+    
+    
     
     
 }
