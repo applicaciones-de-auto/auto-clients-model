@@ -54,7 +54,7 @@ public class Model_Sales_Agent implements GEntity {
             poEntity.moveToInsertRow();
 
             MiscUtil.initRowSet(poEntity);
-            poEntity.updateString("cRecdStat", RecordStatus.ACTIVE);
+            poEntity.updateString("cRecdStat", "0");
 
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
@@ -217,6 +217,8 @@ public class Model_Sales_Agent implements GEntity {
     public JSONObject newRecord() {
         pnEditMode = EditMode.ADDNEW;
 
+        setRecdStat( "0");
+        
         poJSON = new JSONObject();
         poJSON.put("result", "success");
         return poJSON;
@@ -232,10 +234,10 @@ public class Model_Sales_Agent implements GEntity {
     public JSONObject openRecord(String fsValue) {
         poJSON = new JSONObject();
 
-        String lsSQL = MiscUtil.makeSelect(this);
+        String lsSQL = getSQL();
 
         //replace the condition based on the primary key column of the record
-        lsSQL = MiscUtil.addCondition(lsSQL, " sClientID = " + SQLUtil.toSQL(fsValue));
+        lsSQL = MiscUtil.addCondition(lsSQL, " a.sClientID = " + SQLUtil.toSQL(fsValue));
 
         ResultSet loRS = poGRider.executeQuery(lsSQL);
 
@@ -395,9 +397,9 @@ public class Model_Sales_Agent implements GEntity {
                 + " , b.sFrstName "                                                                                          
                 + " , b.sMiddName "                                                                                          
                 + " , b.sCompnyNm "                                                                                          
-                + " , c.sMobileNo "                                                                                          
-                + " , d.sAccountx "                                                                                          
-                + " , e.sEmailAdd "                                                                                          
+//                + " , c.sMobileNo "                                                                                          
+//                + " , d.sAccountx "                                                                                          
+//                + " , e.sEmailAdd "                                                                                          
                 + " , IFNULL(CONCAT( IFNULL(CONCAT(g.sHouseNox,' ') , ''), "                                                 
                 + " IFNULL(CONCAT(g.sAddressx,' ') , ''),  "                                                                 
                 + " IFNULL(CONCAT(i.sBrgyName,' '), ''),   "                                                                 
@@ -405,9 +407,9 @@ public class Model_Sales_Agent implements GEntity {
                 + " IFNULL(CONCAT(j.sProvName),'') )	, '') AS sAddressx  "                                                  
                 + " FROM sales_agent a   "                                                                                   
                 + " LEFT JOIN client_master b ON b.sClientID = a.sClientID "                                                 
-                + " LEFT JOIN client_mobile c ON c.sClientID = a.sClientID AND c.cPrimaryx = 1 AND c.cRecdStat = 1  "        
-                + " LEFT JOIN client_social_media d ON  d.sClientID = a.sClientID AND d.cRecdStat = 1   "                    
-                + " LEFT JOIN client_email_address e ON  e.sClientID = a.sClientID AND e.cPrimaryx = 1 AND e.cRecdStat = 1 " 
+//                + " LEFT JOIN client_mobile c ON c.sClientID = a.sClientID AND c.cPrimaryx = 1 AND c.cRecdStat = 1  "        
+//                + " LEFT JOIN client_social_media d ON  d.sClientID = a.sClientID AND d.cRecdStat = 1   "                    
+//                + " LEFT JOIN client_email_address e ON  e.sClientID = a.sClientID AND e.cPrimaryx = 1 AND e.cRecdStat = 1 " 
                 + " LEFT JOIN client_address f ON f.sClientID = a.sClientID AND f.cPrimaryx = 1 "                            
                 + " LEFT JOIN addresses g ON g.sAddrssID = f.sAddrssID "                                                     
                 + " LEFT JOIN TownCity h ON h.sTownIDxx = g.sTownIDxx  "                                                     
@@ -462,7 +464,7 @@ public class Model_Sales_Agent implements GEntity {
     /**
      * @return The Value of this record.
      */
-    public String gsetRecdStat() {
+    public String getRecdStat() {
         return (String) getValue("cRecdStat");
     }
     
@@ -473,7 +475,7 @@ public class Model_Sales_Agent implements GEntity {
      * @return result as success/failed
      */
     public JSONObject setActive(boolean fbValue) {
-        return setValue("cRecdStat", fbValue ? "1" : "0");
+        return setValue("cRecdStat", fbValue ? "1" : "2");
     }
 
     /**
@@ -577,71 +579,71 @@ public class Model_Sales_Agent implements GEntity {
      * @param fsValue 
      * @return  True if the record assignment is successful.
      */
-    public boolean setMaidenName(String fsValue){
-        setValue("sMaidenNm", fsValue);
+    public boolean setCompnyNm(String fsValue){
+        setValue("sCompnyNm", fsValue);
         return true;
     }
     
     /** 
      * @return The value of this record. 
      */
-    public String getMaidenName(){
-        return (String) getValue("sMaidenNm");
+    public String getCompnyNm(){
+        return (String) getValue("sCompnyNm");
     }
     
-    /**
-     * Sets the value of this record.
-     * 
-     * @param fsValue 
-     * @return  True if the record assignment is successful.
-     */
-    public boolean setMobileNo(String fsValue){
-        setValue("sMobileNo", fsValue);
-        return true;
-    }
-    
-    /** 
-     * @return The value of this record. 
-     */
-    public String getMobileNo(){
-        return (String) getValue("sMobileNo");
-    }
-    
-    /**
-     * Sets the value of this record.
-     * 
-     * @param fsValue 
-     * @return  True if the record assignment is successful.
-     */
-    public boolean setAccount(String fsValue){
-        setValue("sAccountx", fsValue);
-        return true;
-    }
-    
-    /** 
-     * @return The value of this record. 
-     */
-    public String getAccount(){
-        return (String) getValue("sAccountx");
-    }
-    
-    /**
-     * Sets the value of this record.
-     * 
-     * @param fsValue 
-     * @return  True if the record assignment is successful.
-     */
-    public boolean setEmailAdd(String fsValue){
-        setValue("sEmailAdd", fsValue);
-        return true;
-    }
-    
-    /** 
-     * @return The value of this record. 
-     */
-    public String getEmailAdd(){
-        return (String) getValue("sEmailAdd");
-    }
+//    /**
+//     * Sets the value of this record.
+//     * 
+//     * @param fsValue 
+//     * @return  True if the record assignment is successful.
+//     */
+//    public boolean setMobileNo(String fsValue){
+//        setValue("sMobileNo", fsValue);
+//        return true;
+//    }
+//    
+//    /** 
+//     * @return The value of this record. 
+//     */
+//    public String getMobileNo(){
+//        return (String) getValue("sMobileNo");
+//    }
+//    
+//    /**
+//     * Sets the value of this record.
+//     * 
+//     * @param fsValue 
+//     * @return  True if the record assignment is successful.
+//     */
+//    public boolean setAccount(String fsValue){
+//        setValue("sAccountx", fsValue);
+//        return true;
+//    }
+//    
+//    /** 
+//     * @return The value of this record. 
+//     */
+//    public String getAccount(){
+//        return (String) getValue("sAccountx");
+//    }
+//    
+//    /**
+//     * Sets the value of this record.
+//     * 
+//     * @param fsValue 
+//     * @return  True if the record assignment is successful.
+//     */
+//    public boolean setEmailAdd(String fsValue){
+//        setValue("sEmailAdd", fsValue);
+//        return true;
+//    }
+//    
+//    /** 
+//     * @return The value of this record. 
+//     */
+//    public String getEmailAdd(){
+//        return (String) getValue("sEmailAdd");
+//    }
     
     /**
      * Sets the value of this record.
