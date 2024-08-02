@@ -218,6 +218,7 @@ public class Model_Sales_Agent implements GEntity {
         pnEditMode = EditMode.ADDNEW;
 
         setRecdStat( "0");
+        setClientID("");
         
         poJSON = new JSONObject();
         poJSON.put("result", "success");
