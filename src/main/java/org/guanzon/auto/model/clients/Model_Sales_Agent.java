@@ -389,6 +389,9 @@ public class Model_Sales_Agent implements GEntity {
     public String getSQL(){
         return    "   SELECT "                                                                                               
                 + "   a.sClientID "                                                                                          
+                + " , a.sProfessn "                                                                                         
+                + " , a.sCompanyx "                                                                                         
+                + " , a.sPosition "                                                                                         
                 + " , a.sAgentTyp "                                                                                          
                 + " , a.cRecdStat "                                                                                          
                 + " , a.sModified "                                                                                          
@@ -436,7 +439,58 @@ public class Model_Sales_Agent implements GEntity {
     }
     
     /**
-     * Description: Sets the ID of this record.
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setProfessn(String fsValue) {
+        return setValue("sProfessn", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getProfessn() {
+        return (String) getValue("sProfessn");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setCompany(String fsValue) {
+        return setValue("sCompanyx", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getCompany() {
+        return (String) getValue("sCompanyx");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setPosition(String fsValue) {
+        return setValue("sPosition", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getPosition() {
+        return (String) getValue("sPosition");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
      *
      * @param fsValue
      * @return result as success/failed
@@ -446,7 +500,7 @@ public class Model_Sales_Agent implements GEntity {
     }
 
     /**
-     * @return The ID of this record.
+     * @return The Value of this record.
      */
     public String getAgentTyp() {
         return (String) getValue("sAgentTyp");
