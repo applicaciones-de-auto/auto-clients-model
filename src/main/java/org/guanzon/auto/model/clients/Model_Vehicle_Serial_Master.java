@@ -9,6 +9,9 @@ import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import javax.sql.rowset.CachedRowSet;
 import org.guanzon.appdriver.base.CommonUtils;
@@ -16,6 +19,7 @@ import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
+import org.guanzon.appdriver.constant.TransactionStatus;
 import org.guanzon.appdriver.iface.GEntity;
 import org.json.simple.JSONObject;
 
@@ -27,6 +31,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
 
     final String XML = "Model_Vehicle_Serial_Master.xml";
     private final String psDefaultDate = "1900-01-01";
+    private String psTargetBranchCd = "";
     
     GRider poGRider;                //application driver
     CachedRowSet poEntity;          //rowset
@@ -299,7 +304,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                 lsSQL = MiscUtil.makeSQL(this, lsExclude);
 
                 if (!lsSQL.isEmpty()) {
-                    if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
+                    if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), psTargetBranchCd) > 0) {
                         poJSON.put("result", "success");
                         poJSON.put("message", "Record saved successfully.");
                     } else {
@@ -323,7 +328,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                     lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sSerialID = " + SQLUtil.toSQL(this.getSerialID()),lsExclude);
 
                     if (!lsSQL.isEmpty()) {
-                        if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0) {
+                        if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), psTargetBranchCd) > 0) {
                             poJSON.put("result", "success");
                             poJSON.put("message", "Record saved successfully.");
                         } else {
@@ -346,6 +351,19 @@ public class Model_Vehicle_Serial_Master implements GEntity {
         }
 
         return poJSON;
+    }
+    
+    
+    public void setTargetBranchCd(String fsBranchCd){
+        if(fsBranchCd != null){
+            if (!poGRider.getBranchCode().equals(fsBranchCd)){
+                psTargetBranchCd = fsBranchCd;
+            } else {
+                psTargetBranchCd = "";
+            }
+        }else {
+            psTargetBranchCd = "";
+        }
     }
 
     /**
@@ -457,7 +475,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                         + " ELSE '' "              
                         + " END AS sVhclStat " //39         
                         + " , r.sReferNox AS sUdrNoxxx" //40         
-                        + " , r.dTransact AS sUdrDatex" //41         
+                        + " , DATE(r.dTransact) AS sUdrDatex" //41         
                         + " , s.sCompnyNm AS sBuyerNmx " //42         
                         + "FROM vehicle_serial a "              
                         + "LEFT JOIN vehicle_serial_registration b ON a.sSerialID = b.sSerialID "              
@@ -481,7 +499,7 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                         + "LEFT JOIN barangay       p ON p.sBrgyIDxx = nn.sBrgyIDxx AND p.sTownIDxx = nn.sTownIDxx "              
                         + "LEFT JOIN Province       q ON q.sProvIDxx = o.sProvIDxx "              
                          /* UDR INFO */                                                                                                  
-                        + "LEFT JOIN udr_master     r ON r.sSerialID = a.sSerialID AND r.sClientID = a.sClientID AND r.cTranStat = '1' "
+                        + "LEFT JOIN udr_master     r ON r.sSerialID = a.sSerialID AND r.sClientID = a.sClientID AND r.cTranStat <> " + SQLUtil.toSQL(TransactionStatus.STATE_CANCELLED)
                         + "LEFT JOIN client_master  s ON s.sClientID = r.sClientID ";
                 
     }  
@@ -540,6 +558,27 @@ public class Model_Vehicle_Serial_Master implements GEntity {
                 + "LEFT JOIN barangay h ON h.sBrgyIDxx = g.sBrgyIDxx "                                         
                 + "LEFT JOIN towncity i ON i.sTownIDxx = g.sTownIDxx "                                         
                 + "LEFT JOIN province j ON j.sProvIDxx = i.sProvIDxx "  ;  
+    }
+    
+    private static String xsDateShort(Date fdValue) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String date = sdf.format(fdValue);
+        return date;
+    }
+
+    private static String xsDateShort(String fsValue) throws org.json.simple.parser.ParseException, java.text.ParseException {
+        SimpleDateFormat fromUser = new SimpleDateFormat("MMMM dd, yyyy");
+        SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String lsResult = "";
+        lsResult = myFormat.format(fromUser.parse(fsValue));
+        return lsResult;
+    }
+    
+    /*Convert Date to String*/
+    private LocalDate strToDate(String val) {
+        DateTimeFormatter date_formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(val, date_formatter);
+        return localDate;
     }
     
     /**
@@ -1244,7 +1283,14 @@ public class Model_Vehicle_Serial_Master implements GEntity {
      * @return The Value of this record.
      */
     public Date getUdrDate() {
-        return (Date) getValue("sUdrDatex");
+        Date date = null;
+        if(getValue("sUdrDatex") == null || getValue("sUdrDatex").equals("")){
+            date = SQLUtil.toDate(psDefaultDate, SQLUtil.FORMAT_SHORT_DATE);
+        } else {
+            date = SQLUtil.toDate(xsDateShort((Date) getValue("sUdrDatex")), SQLUtil.FORMAT_SHORT_DATE);
+        }
+            
+        return date;
     }
     
     /**
