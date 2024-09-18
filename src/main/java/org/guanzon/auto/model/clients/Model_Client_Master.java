@@ -218,7 +218,7 @@ public class Model_Client_Master implements GEntity{
 
     @Override
     public JSONObject saveRecord() {
-        String lsExclude = "sCntryNme»sTownName»sCustName»sSpouseNm»sAddressx";
+        String lsExclude = "sNational»sTownName»sCustName»sSpouseNm»sAddressx";
         String lsSQL;
         poJSON = new JSONObject();
         
@@ -418,7 +418,7 @@ public class Model_Client_Master implements GEntity{
                 + ", a.dEntryDte "  //22                                                                                
                 + ", a.sModified "  //23                                                                                
                 + ", a.dModified "  //24                                                                                
-                + ", IFNULL(b.sCntryNme, '') sCntryNme " //25                                                         
+                + ", IFNULL(b.sNational, '') sNational " //25                                                         
                 + ", TRIM(CONCAT(c.sTownName, ', ', d.sProvName)) sTownName "   //26                    
                 + ", e.sCompnyNm sSpouseNm " //27
                 + ",  IFNULL(CONCAT( IFNULL(CONCAT(g.sHouseNox,' ') , ''), "                                         
@@ -913,7 +913,7 @@ public class Model_Client_Master implements GEntity{
      * @return  True if the record assignment is successful.
      */
     public boolean setCntryNme(String fsValue){
-        setValue("sCntryNme", fsValue);
+        setValue("sNational", fsValue);
         return true;
     }
     
@@ -921,7 +921,7 @@ public class Model_Client_Master implements GEntity{
      * @return The value of this record. 
      */
     public String getCntryNme(){
-        return (String) getValue("sCntryNme");
+        return (String) getValue("sNational");
     }
     
     /**
