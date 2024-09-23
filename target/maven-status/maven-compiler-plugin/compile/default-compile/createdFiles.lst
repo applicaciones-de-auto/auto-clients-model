@@ -1,6 +1,7 @@
 org\guanzon\auto\model\clients\Model_Client_Address.class
 org\guanzon\auto\model\clients\Model_Client_Email.class
 org\guanzon\auto\model\clients\Model_Client_Master.class
+org\guanzon\auto\model\clients\Model_Service_Mechanic.class
 org\guanzon\auto\model\clients\Model_Addresses.class
 org\guanzon\auto\model\clients\Model_Sales_Executive.class
 org\guanzon\auto\model\clients\Model_Sales_Agent.class
