@@ -65,6 +65,7 @@ public class Model_Vehicle_Gatepass implements GEntity {
             MiscUtil.initRowSet(poEntity);        
             poEntity.updateObject("dTransact", poGRider.getServerDate()); 
             poEntity.updateString("cTranStat", TransactionStatus.STATE_OPEN); //TransactionStatus.STATE_OPEN why is the value of STATE_OPEN is 0 while record status active is 1
+            poEntity.updateString("cPrintedx", "0");
             
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
