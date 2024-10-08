@@ -8,6 +8,7 @@ org\guanzon\auto\model\clients\Model_Vehicle_Registration.class
 org\guanzon\auto\model\clients\Model_Client_Email.class
 org\guanzon\auto\model\clients\Model_Addresses.class
 org\guanzon\auto\model\clients\Model_Sales_Executive.class
+org\guanzon\auto\model\clients\Model_Vehicle_Gatepass_Released_Items.class
 org\guanzon\auto\model\clients\Model_Vehicle_Gatepass.class
 org\guanzon\auto\model\clients\Model_Client_Mobile.class
 org\guanzon\auto\model\clients\Model_Service_Advisor.class

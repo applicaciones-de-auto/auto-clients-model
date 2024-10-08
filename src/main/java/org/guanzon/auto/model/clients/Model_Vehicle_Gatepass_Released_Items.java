@@ -244,8 +244,8 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
         String lsSQL = getSQL(); //MiscUtil.makeSelect(this, psExclude); //exclude the columns called thru left join
         //replace the condition based on the primary key column of the record
         lsSQL = MiscUtil.addCondition(lsSQL, " a.sTransNox = " + SQLUtil.toSQL(fsValue)
-                                                + " AND (sLaborCde = " + SQLUtil.toSQL(fsValue2)
-                                                + " OR sStockIDx = " + SQLUtil.toSQL(fsValue2) + " ) "
+                                                + " AND (a.sLaborCde = " + SQLUtil.toSQL(fsValue2)
+                                                + " OR a.sStockIDx = " + SQLUtil.toSQL(fsValue2) + " ) "
                                                 );
 
         System.out.println(lsSQL);
