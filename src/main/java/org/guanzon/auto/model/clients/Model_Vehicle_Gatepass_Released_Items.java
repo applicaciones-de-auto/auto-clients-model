@@ -30,7 +30,7 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
     final String XML = "Model_Vehicle_Gatepass_Released_Items.xml";
     private final String psDefaultDate = "1900-01-01";
     private String psTargetBranchCd;
-    private String psExclude = "sLaborDsc»sStockDsc"; //»
+    private String psExclude = "sLaborDsc»sStockDsc»sDSNoxxxx"; //»
     
     GRider poGRider;                //application driver
     CachedRowSet poEntity;          //rowset
@@ -440,7 +440,8 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
                 + "  , a.nQuantity "                                     
                 + "  , a.nReleased "                                     
                 + "  , b.sLaborDsc "                                     
-                + "  , c.sDescript AS sStockDsc "                                     
+                + "  , c.sDescript AS sStockDsc "                         
+                + "  , 'xxxxxxxxxxxx' AS sDSNoxxxx "                                  
                 + " FROM vehicle_released_items a "                      
                 + " LEFT JOIN labor b ON b.sLaborCde = a.sLaborCde "     
                 + " LEFT JOIN inventory c ON c.sStockIDx = a.sStockIDx "  ;                          
@@ -580,5 +581,22 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
      */
     public String getStockDsc() {
         return (String) getValue("sStockDsc");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return True if the record assignment is successful.
+     */
+    public JSONObject setDSNo(String fsValue) {
+        return setValue("sDSNoxxxx", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getDSNo() {
+        return (String) getValue("sDSNoxxxx");
     }
 }
