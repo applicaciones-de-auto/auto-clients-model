@@ -441,7 +441,7 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
                 + "  , a.nReleased "                                     
                 + "  , b.sLaborDsc "                                     
                 + "  , c.sDescript AS sStockDsc "                         
-                + "  , 'xxxxxxxxxxxx' AS sDSNoxxxx "                                  
+                + "  , '' AS sDSNoxxxx "                                  
                 + " FROM vehicle_released_items a "                      
                 + " LEFT JOIN labor b ON b.sLaborCde = a.sLaborCde "     
                 + " LEFT JOIN inventory c ON c.sStockIDx = a.sStockIDx "  ;                          
