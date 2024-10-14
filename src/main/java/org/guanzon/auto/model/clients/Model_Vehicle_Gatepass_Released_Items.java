@@ -244,8 +244,9 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
         String lsSQL = getSQL(); //MiscUtil.makeSelect(this, psExclude); //exclude the columns called thru left join
         //replace the condition based on the primary key column of the record
         lsSQL = MiscUtil.addCondition(lsSQL, " a.sTransNox = " + SQLUtil.toSQL(fsValue)
-                                                + " AND (a.sLaborCde = " + SQLUtil.toSQL(fsValue2)
-                                                + " OR a.sStockIDx = " + SQLUtil.toSQL(fsValue2) + " ) "
+                                                + " AND a.sItemCode = " + SQLUtil.toSQL(fsValue2)
+//                                                + " AND (a.sLaborCde = " + SQLUtil.toSQL(fsValue2)
+//                                                + " OR a.sStockIDx = " + SQLUtil.toSQL(fsValue2) + " ) "
                                                 );
 
         System.out.println(lsSQL);
@@ -306,16 +307,17 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
                 
                 //replace with the primary key column info
                 JSONObject loJSON = new JSONObject();
-                switch(this.getItemType()){
-                    case "l":
-                        loJSON = loOldEntity.openRecord(this.getTransNo(),this.getLaborCde());
-                    break;
-                    case "p":
-                        loJSON = loOldEntity.openRecord(this.getTransNo(),this.getStockID());
-                    break;
-                    case "d":
-                    break;
-                }
+                loJSON = loOldEntity.openRecord(this.getTransNo(),this.getItemCode());
+//                switch(this.getItemType()){
+//                    case "l":
+//                        loJSON = loOldEntity.openRecord(this.getTransNo(),this.getItemCode());
+//                    break;
+//                    case "p":
+//                        loJSON = loOldEntity.openRecord(this.getTransNo(),this.getStockID());
+//                    break;
+//                    case "d":
+//                    break;
+//                }
 
                 if ("success".equals((String) loJSON.get("result"))) {
                     
@@ -361,8 +363,9 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
         
         String lsSQL = " DELETE FROM "+getTable()+" WHERE "
                     + " sTransNox = " + SQLUtil.toSQL(this.getTransNo())
-                    + " AND sLaborCde = " + SQLUtil.toSQL(this.getLaborCde())
-                    + " AND sStockIDx = " + SQLUtil.toSQL(this.getStockID());
+                    + " AND sItemCode = " + SQLUtil.toSQL(this.getItemCode());
+//                    + " AND sLaborCde = " + SQLUtil.toSQL(this.getLaborCde())
+//                    + " AND sStockIDx = " + SQLUtil.toSQL(this.getStockID());
         if (!lsSQL.isEmpty()) {
             if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), psTargetBranchCd) > 0) {
                 poJSON.put("result", "success");
@@ -435,16 +438,17 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
         return    " SELECT "                                             
                 + "    a.sTransNox "                                     
                 + "  , a.sItemType "                                     
-                + "  , a.sLaborCde "                                     
-                + "  , a.sStockIDx "                                     
+                + "  , a.sItemCode "                                     
+//                + "  , a.sLaborCde "                                     
+//                + "  , a.sStockIDx "                                     
                 + "  , a.nQuantity "                                     
                 + "  , a.nReleased "                                     
                 + "  , b.sLaborDsc "                                     
                 + "  , c.sDescript AS sStockDsc "                         
                 + "  , '' AS sDSNoxxxx "                                  
                 + " FROM vehicle_released_items a "                      
-                + " LEFT JOIN labor b ON b.sLaborCde = a.sLaborCde "     
-                + " LEFT JOIN inventory c ON c.sStockIDx = a.sStockIDx "  ;                          
+                + " LEFT JOIN labor b ON b.sLaborCde = a.sItemCode "     
+                + " LEFT JOIN inventory c ON c.sStockIDx = a.sItemCode "  ;                          
     }
     
     /**
@@ -487,33 +491,50 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
      * @param fsValue
      * @return True if the record assignment is successful.
      */
-    public JSONObject setLaborCde(String fsValue) {
-        return setValue("sLaborCde", fsValue);
+    public JSONObject setItemCode(String fsValue) {
+        return setValue("sItemCode", fsValue);
     }
 
     /**
      * @return The Value of this record.
      */
-    public String getLaborCde() {
-        return (String) getValue("sLaborCde");
+    public String getItemCode() {
+        return (String) getValue("sItemCode");
     }
     
-    /**
-     * Description: Sets the Value of this record.
-     *
-     * @param fsValue
-     * @return True if the record assignment is successful.
-     */
-    public JSONObject setStockID(String fsValue) {
-        return setValue("sStockIDx", fsValue);
-    }
-
-    /**
-     * @return The Value of this record.
-     */
-    public String getStockID() {
-        return (String) getValue("sStockIDx");
-    }
+//    /**
+//     * Description: Sets the Value of this record.
+//     *
+//     * @param fsValue
+//     * @return True if the record assignment is successful.
+//     */
+//    public JSONObject setLaborCde(String fsValue) {
+//        return setValue("sLaborCde", fsValue);
+//    }
+//
+//    /**
+//     * @return The Value of this record.
+//     */
+//    public String getLaborCde() {
+//        return (String) getValue("sLaborCde");
+//    }
+//    
+//    /**
+//     * Description: Sets the Value of this record.
+//     *
+//     * @param fsValue
+//     * @return True if the record assignment is successful.
+//     */
+//    public JSONObject setStockID(String fsValue) {
+//        return setValue("sStockIDx", fsValue);
+//    }
+//
+//    /**
+//     * @return The Value of this record.
+//     */
+//    public String getStockID() {
+//        return (String) getValue("sStockIDx");
+//    }
     
     /**
      * Description: Sets the Value of this record.
