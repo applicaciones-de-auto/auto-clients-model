@@ -9,13 +9,18 @@ import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import javax.sql.rowset.CachedRowSet;
+import org.guanzon.appdriver.base.CommonUtils;
 import org.guanzon.appdriver.base.GRider;
 import org.guanzon.appdriver.base.MiscUtil;
 import org.guanzon.appdriver.base.SQLUtil;
 import org.guanzon.appdriver.constant.EditMode;
 import org.guanzon.appdriver.constant.RecordStatus;
+import org.guanzon.appdriver.constant.TransactionStatus;
 import org.guanzon.appdriver.iface.GEntity;
 import org.json.simple.JSONObject;
 
@@ -25,7 +30,7 @@ import org.json.simple.JSONObject;
  */
 public class Model_Sales_Agent implements GEntity {
     final String XML = "Model_Sales_Agent.xml";
-
+    String psDefaultDate = "1900-01-01";
     GRider poGRider;                //application driver
     CachedRowSet poEntity;          //rowset
     JSONObject poJSON;              //json container
@@ -40,7 +45,7 @@ public class Model_Sales_Agent implements GEntity {
             System.err.println("Application Driver is not set.");
             System.exit(1);
         }
-
+        
         poGRider = foValue;
 
         initialize();
@@ -55,6 +60,7 @@ public class Model_Sales_Agent implements GEntity {
 
             MiscUtil.initRowSet(poEntity);
             poEntity.updateString("cRecdStat", "0");
+            poEntity.updateObject("dApprovex", SQLUtil.toDate(psDefaultDate, SQLUtil.FORMAT_SHORT_DATE));
 
             poEntity.insertRow();
             poEntity.moveToCurrentRow();
@@ -271,7 +277,7 @@ public class Model_Sales_Agent implements GEntity {
      */
     @Override
     public JSONObject saveRecord() {
-        String lsExclude = "sCompnyNm»sAddressx»sLastName»sFrstName»sMiddName»sMobileNo»sAccountx»sEmailAdd»cClientTp";
+        String lsExclude = "sCompnyNm»sAddressx»sLastName»sFrstName»sMiddName»sMobileNo»sAccountx»sEmailAdd»cClientTp»dApprovex»sApprover";
         poJSON = new JSONObject();
 
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE) {
@@ -408,7 +414,9 @@ public class Model_Sales_Agent implements GEntity {
                 + " IFNULL(CONCAT(g.sAddressx,' ') , ''),  "                                                                 
                 + " IFNULL(CONCAT(i.sBrgyName,' '), ''),   "                                                                 
                 + " IFNULL(CONCAT(h.sTownName, ', '),''),  "                                                                 
-                + " IFNULL(CONCAT(j.sProvName),'') )	, '') AS sAddressx  "                                                  
+                + " IFNULL(CONCAT(j.sProvName),'') )	, '') AS sAddressx  "                                                                                 
+                + " , DATE(k.dApproved) AS dApprovex "                                                                           
+                + " , l.sCompnyNm AS sApprover "                                                   
                 + " FROM sales_agent a   "                                                                                   
                 + " LEFT JOIN client_master b ON b.sClientID = a.sClientID "                                                 
 //                + " LEFT JOIN client_mobile c ON c.sClientID = a.sClientID AND c.cPrimaryx = 1 AND c.cRecdStat = 1  "        
@@ -418,7 +426,30 @@ public class Model_Sales_Agent implements GEntity {
                 + " LEFT JOIN addresses g ON g.sAddrssID = f.sAddrssID "                                                     
                 + " LEFT JOIN TownCity h ON h.sTownIDxx = g.sTownIDxx  "                                                     
                 + " LEFT JOIN barangay i ON i.sBrgyIDxx = g.sBrgyIDxx AND i.sTownIDxx = g.sTownIDxx  "                       
-                + " LEFT JOIN Province j ON j.sProvIDxx = h.sProvIDxx  " ;                                                                  
+                + " LEFT JOIN Province j ON j.sProvIDxx = h.sProvIDxx  "
+                + " LEFT JOIN transaction_status_history k ON k.sSourceNo = a.sClientID AND k.cTranStat <> "+ SQLUtil.toSQL(TransactionStatus.STATE_CANCELLED)
+                + " LEFT JOIN ggc_isysdbf.client_master l ON l.sClientID = k.sApproved " ;                                                                  
+    }
+    
+    private static String xsDateShort(Date fdValue) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String date = sdf.format(fdValue);
+        return date;
+    }
+
+    private static String xsDateShort(String fsValue) throws org.json.simple.parser.ParseException, java.text.ParseException {
+        SimpleDateFormat fromUser = new SimpleDateFormat("MMMM dd, yyyy");
+        SimpleDateFormat myFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String lsResult = "";
+        lsResult = myFormat.format(fromUser.parse(fsValue));
+        return lsResult;
+    }
+    
+    /*Convert Date to String*/
+    private LocalDate strToDate(String val) {
+        DateTimeFormatter date_formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(val, date_formatter);
+        return localDate;
     }
     
     /**
@@ -718,8 +749,46 @@ public class Model_Sales_Agent implements GEntity {
         return (String) getValue("sAddressx");
     }
     
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fdValue
+     * @return result as success/failed
+     */
+    public JSONObject setApproveDte(Date fdValue) {
+        return setValue("dApprovex", fdValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public Date getApproveDte() {
+        Date date = null;
+        if(getValue("dApprovex") == null || getValue("dApprovex").equals("")){
+            date = SQLUtil.toDate(psDefaultDate, SQLUtil.FORMAT_SHORT_DATE);
+        } else {
+            date = SQLUtil.toDate(xsDateShort((Date) getValue("dApprovex")), SQLUtil.FORMAT_SHORT_DATE);
+        }
+            
+        return date;
+    }
     
-    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return result as success/failed
+     */
+    public JSONObject setApprover(String fsValue) {
+        return setValue("sApprover", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getApprover() {
+        return (String) getValue("sApprover");
+    }
     
 }
 
