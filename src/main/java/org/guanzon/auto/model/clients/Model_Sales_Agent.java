@@ -427,7 +427,7 @@ public class Model_Sales_Agent implements GEntity {
                 + " LEFT JOIN TownCity h ON h.sTownIDxx = g.sTownIDxx  "                                                     
                 + " LEFT JOIN barangay i ON i.sBrgyIDxx = g.sBrgyIDxx AND i.sTownIDxx = g.sTownIDxx  "                       
                 + " LEFT JOIN Province j ON j.sProvIDxx = h.sProvIDxx  "
-                + " LEFT JOIN transaction_status_history k ON k.sSourceNo = a.sClientID AND k.cTranStat <> "+ SQLUtil.toSQL(TransactionStatus.STATE_CANCELLED)
+                + " LEFT JOIN transaction_status_history k ON k.sSourceNo = a.sClientID AND k.cRefrStat = " + SQLUtil.toSQL(TransactionStatus.STATE_CLOSED) + " AND k.cTranStat <> "+ SQLUtil.toSQL(TransactionStatus.STATE_CANCELLED)
                 + " LEFT JOIN ggc_isysdbf.client_master l ON l.sClientID = k.sApproved " ;                                                                  
     }
     
