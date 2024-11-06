@@ -32,6 +32,7 @@ public class Model_Addresses implements GEntity{
     String psMessage;           //warning, success or error message
     GRider poGRider;
     int pnEditMode;
+    String psExclude = "trimAddress»sBrgyName»sTownName»sProvName»sProvIDxx";
     
     public JSONObject poJSON;
     
@@ -212,7 +213,6 @@ public class Model_Addresses implements GEntity{
 
     @Override
     public JSONObject saveRecord() {
-        String lsExclude = "trimAddress»sBrgyName»sTownName»sProvName»sProvIDxx";
         String lsSQL;
         poJSON = new JSONObject();
         if (pnEditMode == EditMode.ADDNEW || pnEditMode == EditMode.UPDATE){
@@ -222,7 +222,7 @@ public class Model_Addresses implements GEntity{
                 setModifiedDte(poGRider.getServerDate());
                 setModifiedBy(poGRider.getUserID());
                 
-                lsSQL = MiscUtil.makeSQL(this, lsExclude);
+                lsSQL = MiscUtil.makeSQL(this, psExclude);
                 
                 if (!lsSQL.isEmpty()){
                     if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
@@ -247,7 +247,7 @@ public class Model_Addresses implements GEntity{
                 
                 if ("success".equals((String) loJSON.get("result"))){
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sAddrssID = " + SQLUtil.toSQL(this.getAddressID()), lsExclude);
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sAddrssID = " + SQLUtil.toSQL(this.getAddressID()), psExclude);
                     
                     if (!lsSQL.isEmpty()){
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), "") > 0){
@@ -309,6 +309,26 @@ public class Model_Addresses implements GEntity{
         } catch (SQLException e) {
         }
         
+    }
+    
+    
+    
+    /**
+     * Gets the SQL statement for this entity.
+     *
+     * @return SQL Statement
+     */
+    public String makeSQL() {
+        return MiscUtil.makeSQL(this, psExclude);
+    }
+    
+    /**
+     * Gets the SQL Select statement for this entity.
+     *
+     * @return SQL Select Statement
+     */
+    public String makeSelectSQL() {
+        return MiscUtil.makeSelect(this, psExclude);
     }
     
     public String getSQL() {
