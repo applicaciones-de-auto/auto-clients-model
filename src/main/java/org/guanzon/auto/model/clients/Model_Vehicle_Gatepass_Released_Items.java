@@ -30,7 +30,7 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
     final String XML = "Model_Vehicle_Gatepass_Released_Items.xml";
     private final String psDefaultDate = "1900-01-01";
     private String psTargetBranchCd;
-    private String psExclude = "sLaborDsc»sStockDsc»sDSNoxxxx"; //»
+    private String psExclude = "sLaborDsc»sStockDsc»sDSNoxxxx»sDefltDsc"; //»
     
     GRider poGRider;                //application driver
     CachedRowSet poEntity;          //rowset
@@ -300,6 +300,7 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
                     }
                 } else {
                     poJSON.put("result", "error");
+                    poJSON.put("continue", true);
                     poJSON.put("message", "No record to save.");
                 }
             } else {
@@ -336,6 +337,7 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
                         }
                     } else {
                         poJSON.put("result", "success");
+                        poJSON.put("continue", true);
                         poJSON.put("message", "No updates has been made.");
                     }
                 } else {
@@ -447,10 +449,12 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
                 + "  , a.nReleased "                                     
                 + "  , b.sLaborDsc "                                     
                 + "  , c.sDescript AS sStockDsc "                         
-                + "  , '' AS sDSNoxxxx "                                  
+                + "  , '' AS sDSNoxxxx "                             
+                + "  , d.sItemDesc AS sDefltDsc "                            
                 + " FROM vehicle_released_items a "                      
-                + " LEFT JOIN labor b ON b.sLaborCde = a.sItemCode "     
-                + " LEFT JOIN inventory c ON c.sStockIDx = a.sItemCode "  ;                          
+                + " LEFT JOIN labor b ON b.sLaborCde = a.sItemCode AND a.sItemType = 'l'"     
+                + " LEFT JOIN inventory c ON c.sStockIDx = a.sItemCode AND a.sItemType = 'p'" 
+                + " LEFT JOIN default_released_items_checklist d ON d.sItemCode = a.sItemCode AND a.sItemType = 'd'"  ;                          
     }
     
     /**
@@ -621,5 +625,22 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
      */
     public String getDSNo() {
         return (String) getValue("sDSNoxxxx");
+    }
+    
+    /**
+     * Description: Sets the Value of this record.
+     *
+     * @param fsValue
+     * @return True if the record assignment is successful.
+     */
+    public JSONObject setDefltDsc(String fsValue) {
+        return setValue("sDefltDsc", fsValue);
+    }
+
+    /**
+     * @return The Value of this record.
+     */
+    public String getDefltDsc() {
+        return (String) getValue("sDefltDsc");
     }
 }
