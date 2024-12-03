@@ -238,14 +238,14 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
      * @param fsValue - filter values
      * @return result as success/failed
      */
-    public JSONObject openRecord(String fsValue, String fsValue2) {
+    public JSONObject openRecord(String fsTransNo, String fsItemCode, String fsItemType) {
         poJSON = new JSONObject();
 
         String lsSQL = getSQL(); //MiscUtil.makeSelect(this, psExclude); //exclude the columns called thru left join
         //replace the condition based on the primary key column of the record
-        lsSQL = MiscUtil.addCondition(lsSQL, " a.sTransNox = " + SQLUtil.toSQL(fsValue)
-                                                + " AND a.sItemCode = " + SQLUtil.toSQL(fsValue2)
-//                                                + " AND (a.sLaborCde = " + SQLUtil.toSQL(fsValue2)
+        lsSQL = MiscUtil.addCondition(lsSQL, " a.sTransNox = " + SQLUtil.toSQL(fsTransNo)
+                                                + " AND a.sItemCode = " + SQLUtil.toSQL(fsItemCode)
+                                                + " AND a.sItemType = " + SQLUtil.toSQL(fsItemType)
 //                                                + " OR a.sStockIDx = " + SQLUtil.toSQL(fsValue2) + " ) "
                                                 );
 
@@ -307,7 +307,7 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
                 
                 //replace with the primary key column info
                 JSONObject loJSON = new JSONObject();
-                loJSON = loOldEntity.openRecord(this.getTransNo(),this.getItemCode());
+                loJSON = loOldEntity.openRecord(this.getTransNo(),this.getItemCode(),this.getItemType());
 //                switch(this.getItemType()){
 //                    case "l":
 //                        loJSON = loOldEntity.openRecord(this.getTransNo(),this.getItemCode());
@@ -322,7 +322,9 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
                 if ("success".equals((String) loJSON.get("result"))) {
                     
                     //replace the condition based on the primary key column of the record
-                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, "sTransNox = " + SQLUtil.toSQL(this.getTransNo()), psExclude);
+                    lsSQL = MiscUtil.makeSQL(this, loOldEntity, " sTransNox = " + SQLUtil.toSQL(this.getTransNo()) 
+                                                                                + " AND sItemCode = " + SQLUtil.toSQL(this.getItemCode())
+                                                                                + " AND sItemType = " + SQLUtil.toSQL(this.getItemType()), psExclude);
 
                     if (!lsSQL.isEmpty()) {
                         if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), psTargetBranchCd) > 0) {
@@ -363,8 +365,8 @@ public class Model_Vehicle_Gatepass_Released_Items implements GEntity {
         
         String lsSQL = " DELETE FROM "+getTable()+" WHERE "
                     + " sTransNox = " + SQLUtil.toSQL(this.getTransNo())
-                    + " AND sItemCode = " + SQLUtil.toSQL(this.getItemCode());
-//                    + " AND sLaborCde = " + SQLUtil.toSQL(this.getLaborCde())
+                    + " AND sItemCode = " + SQLUtil.toSQL(this.getItemCode())
+                    + " AND sItemType = " + SQLUtil.toSQL(this.getItemType());
 //                    + " AND sStockIDx = " + SQLUtil.toSQL(this.getStockID());
         if (!lsSQL.isEmpty()) {
             if (poGRider.executeQuery(lsSQL, getTable(), poGRider.getBranchCode(), psTargetBranchCd) > 0) {
